@@ -383,13 +383,13 @@ async function downloadArt(name){
   if(!window.docxLoaded||!window.docx){alert('Documents still loading — please wait a moment and try again.');return;}
   const content=S.artContent[name];
   if(!content){alert('Document not yet generated.');return;}
-  try{const d=contentToDocx(name,content);const{Packer}=getDocx();const buf=await Packer.toBuffer(d);const blob=new Blob([buf],{type:'application/vnd.openxmlformats-officedocument.wordprocessingml.document'});const url=URL.createObjectURL(blob);const a=document.createElement('a');a.href=url;a.download=name.replace(/[^a-z0-9]/gi,'_').toLowerCase()+'.docx';a.click();URL.revokeObjectURL(url);}catch(e){alert('Error generating document: '+e.message);}
+  try{const d=contentToDocx(name,content);const{Packer}=getDocx();const blob=await Packer.toBlob(d);const url=URL.createObjectURL(blob);const a=document.createElement('a');a.href=url;a.download=name.replace(/[^a-z0-9]/gi,'_').toLowerCase()+'.docx';a.click();URL.revokeObjectURL(url);}catch(e){alert('Error generating document: '+e.message);}
 }
 async function downloadAll(){
   if(!window.docxLoaded||!window.docx){alert('Documents still loading — please wait a moment and try again.');return;}
   const done=ALL_ARTS.filter(a=>S.artContent[a]);if(!done.length){alert('No documents generated yet.');return;}
   const{Packer}=getDocx();const zip=new JSZip();
-  for(const name of done){try{const d=contentToDocx(name,S.artContent[name]);const buf=await Packer.toBuffer(d);zip.file(name.replace(/[^a-z0-9]/gi,'_').toLowerCase()+'.docx',buf);}catch(e){console.error('Skip',name,e);}}
+  for(const name of done){try{const d=contentToDocx(name,S.artContent[name]);const buf=await Packer.toBlob(d).then(b=>b.arrayBuffer());zip.file(name.replace(/[^a-z0-9]/gi,'_').toLowerCase()+'.docx',buf);}catch(e){console.error('Skip',name,e);}}
   const blob=await zip.generateAsync({type:'blob'});const url=URL.createObjectURL(blob);const a=document.createElement('a');a.href=url;a.download=S.org.replace(/[^a-z0-9]/gi,'_').toLowerCase()+'_iso9001_pack.zip';a.click();URL.revokeObjectURL(url);
 }
 function resetSession(){if(!confirm('This will clear all your progress and start fresh. Are you sure?'))return;localStorage.removeItem(STORAGE_KEY);location.reload();}
