@@ -46,6 +46,11 @@ body{font-family:var(--sans);background:var(--fog);color:var(--ink);height:100vh
 .fetch-btn{padding:9px 14px;background:var(--teal);color:white;border:none;border-radius:8px;font-size:12px;font-weight:500;cursor:pointer;white-space:nowrap;flex-shrink:0}
 .fetch-btn:hover{background:var(--teal-dark)}
 .fetch-btn:disabled{background:var(--border);color:#aaa;cursor:not-allowed}
+.brand-or{display:flex;align-items:center;gap:10px;margin:10px 0;color:#bbb;font-size:11px}
+.brand-or::before,.brand-or::after{content:'';flex:1;height:1px;background:var(--border)}
+.brand-upload-btn{width:100%;padding:9px 14px;background:var(--fog);color:var(--gray);border:1px solid var(--border);border-radius:8px;font-size:12px;font-weight:500;cursor:pointer;text-align:center;transition:all 0.15s;font-family:var(--sans)}
+.brand-upload-btn:hover{border-color:var(--teal);color:var(--teal-dark);background:var(--teal-lite)}
+.brand-upload-processing{display:none;align-items:center;gap:8px;padding:8px 10px;background:var(--mist);border:1px solid var(--teal-mid);border-radius:8px;margin-top:6px;font-size:12px;color:var(--teal-dark)}
 .brand-preview{display:none;align-items:center;gap:10px;padding:8px 10px;background:var(--fog);border:1px solid var(--border);border-radius:8px;margin-top:6px}
 .brand-preview img{width:28px;height:28px;border-radius:4px;object-fit:contain}
 .brand-preview-name{font-size:12px;font-weight:500;color:var(--ink)}
@@ -54,6 +59,7 @@ body{font-family:var(--sans);background:var(--fog);color:var(--ink);height:100vh
 .colour-fallback{display:none;gap:10px;align-items:center;margin-top:6px}
 .colour-fallback label{font-size:12px;color:var(--gray)}
 .colour-fallback input[type=color]{width:36px;height:28px;border:1px solid var(--border);border-radius:6px;cursor:pointer;padding:2px}
+.colour-swatch{display:inline-block;width:16px;height:16px;border-radius:50%;border:1px solid rgba(0,0,0,0.1);vertical-align:middle;margin-right:4px}
 .existing-opts{display:flex;flex-direction:column;gap:6px}
 .existing-opt{display:flex;align-items:flex-start;gap:10px;padding:10px 12px;border:1px solid var(--border);border-radius:8px;cursor:pointer;transition:all 0.15s}
 .existing-opt:hover{border-color:var(--teal-mid);background:var(--mist)}
@@ -139,6 +145,7 @@ body{font-family:var(--sans);background:var(--fog);color:var(--ink);height:100vh
 .attach-preview-size{font-size:10px;color:var(--gray);flex-shrink:0}
 .attach-clear{background:none;border:none;cursor:pointer;color:var(--danger);font-size:14px;padding:0;flex-shrink:0;line-height:1}
 #fileInput{display:none}
+#brandGuideInput{display:none}
 .art-panel{width:210px;border-left:1px solid var(--border);display:flex;flex-direction:column;overflow:hidden;flex-shrink:0;background:var(--fog)}
 .art-head{padding:12px 14px 8px;border-bottom:1px solid var(--border);font-size:11px;font-weight:600;color:var(--gray);flex-shrink:0;text-transform:uppercase;letter-spacing:0.06em}
 .art-list{flex:1;overflow-y:auto;padding:8px}
@@ -195,18 +202,31 @@ body{font-family:var(--sans);background:var(--fog);color:var(--ink);height:100vh
     <div class="setup-section">
       <div class="setup-section-title">Your Branding <span style="font-weight:400;text-transform:none;letter-spacing:0">(optional)</span></div>
       <div class="field">
-        <label class="lbl">Your website <span>(we will pull your logo automatically)</span></label>
+        <label class="lbl">Your website <span>(we will pull your logo and brand colour automatically)</span></label>
         <div class="brand-fetch-row"><input class="inp" type="text" id="brandDomain" placeholder="e.g. acme.com.au"/><button class="fetch-btn" id="fetchBtn" onclick="fetchBrand()">Fetch</button></div>
-        <div class="brand-preview" id="brandPreview"><img id="brandLogo" src="" alt="logo"/><div><div class="brand-preview-name" id="brandName"></div><div class="brand-preview-url" id="brandUrl"></div></div><button class="brand-preview-clear" onclick="clearBrand()">x Clear</button></div>
-        <div class="colour-fallback" id="colourFallback"><label>Pick your brand colour:</label><input type="color" id="brandColour" value="#1D9E75"/></div>
+        <div class="brand-or">── OR ──</div>
+        <input type="file" id="brandGuideInput" accept=".pdf,.docx,application/pdf,application/vnd.openxmlformats-officedocument.wordprocessingml.document" onchange="handleBrandGuideUpload(event)"/>
+        <button class="brand-upload-btn" onclick="document.getElementById('brandGuideInput').click()">📄 Upload brand style guide (PDF or DOCX)</button>
+        <div class="brand-upload-processing" id="brandUploadProcessing">
+          <span>⏳</span><span id="brandUploadStatus">Reading your brand guide...</span>
+        </div>
+        <div class="brand-preview" id="brandPreview">
+          <img id="brandLogo" src="" alt="logo"/>
+          <div><div class="brand-preview-name" id="brandName"></div><div class="brand-preview-url" id="brandUrl"></div></div>
+          <button class="brand-preview-clear" onclick="clearBrand()">✕ Clear</button>
+        </div>
+        <div class="colour-fallback" id="colourFallback">
+          <label>Pick your brand colour:</label>
+          <input type="color" id="brandColour" value="#1D9E75"/>
+        </div>
       </div>
     </div>
     <div class="setup-section">
       <div class="setup-section-title">Existing Documentation</div>
       <div class="existing-opts">
         <div class="existing-opt selected" id="opt-none" onclick="selectExisting('none')"><div class="existing-opt-dot"></div><div class="existing-opt-text"><h4>Starting from scratch</h4><p>No existing quality documentation. Build everything fresh.</p></div></div>
-        <div class="existing-opt" id="opt-some" onclick="selectExisting('some')"><div class="existing-opt-text"><h4>We have some documentation</h4><p>Informal processes, some policies, or partial documentation.</p></div></div>
-        <div class="existing-opt" id="opt-all" onclick="selectExisting('all')"><div class="existing-opt-text"><h4>We have most documentation</h4><p>Mostly there. Trixie will identify gaps and generate only what is missing.</p></div></div>
+        <div class="existing-opt" id="opt-some" onclick="selectExisting('some')"><div class="existing-opt-dot"></div><div class="existing-opt-text"><h4>We have some documentation</h4><p>Informal processes, some policies, or partial documentation.</p></div></div>
+        <div class="existing-opt" id="opt-all" onclick="selectExisting('all')"><div class="existing-opt-dot"></div><div class="existing-opt-text"><h4>We have most documentation</h4><p>Mostly there. Trixie will identify gaps and generate only what is missing.</p></div></div>
       </div>
     </div>
     <button class="btn-start" id="startBtn" onclick="handleStart()">Start my certification journey</button>
@@ -233,11 +253,11 @@ body{font-family:var(--sans);background:var(--fog);color:var(--ink);height:100vh
             <span class="attach-preview-icon" id="attachIcon">PDF</span>
             <span class="attach-preview-name" id="attachName"></span>
             <span class="attach-preview-size" id="attachSize"></span>
-            <button class="attach-clear" onclick="clearAttachment()" title="Remove file">x</button>
+            <button class="attach-clear" onclick="clearAttachment()" title="Remove file">✕</button>
           </div>
           <div class="input-row">
             <button class="attach-btn" id="attachBtn" onclick="document.getElementById('fileInput').click()" title="Attach a PDF or DOCX document">📎</button>
-            <input type="file" id="fileInput" accept=".pdf,.docx,application/pdf,application/vnd.openxmlformats-officedocument.wordprocessingml.document" onchange="handleFileSelect(event)"/>
+            <input type="file" id="fileInput" accept=".pdf,.docx,.txt,application/pdf,application/vnd.openxmlformats-officedocument.wordprocessingml.document,text/plain" onchange="handleFileSelect(event)"/>
             <input type="text" id="userInput" placeholder="Reply to Trixie... or attach a document with 📎" onkeydown="if(event.key==='Enter'&&!event.shiftKey)sendMsg()"/>
             <button class="send-btn" id="sendBtn" onclick="sendMsg()">Send</button>
           </div>
@@ -259,11 +279,52 @@ const TRUSTPILOT_URL='https://www.trustpilot.com/review/gettrixie.com';
 const CLAUSES=[{id:'c4',label:'Clause 4',sub:'Context',artefacts:['QMS scope statement','Context & interested parties analysis']},{id:'c5',label:'Clause 5',sub:'Leadership',artefacts:['Quality policy','Roles & authorities register']},{id:'c6',label:'Clause 6',sub:'Planning',artefacts:['Risk & opportunities register','Quality objectives register']},{id:'c7',label:'Clause 7',sub:'Support',artefacts:['Competence & training framework','Documented information register']},{id:'c8',label:'Clause 8',sub:'Operation',artefacts:['Process controls summary']},{id:'c9',label:'Clause 9',sub:'Performance evaluation',artefacts:['Internal audit programme']},{id:'c10',label:'Clause 10',sub:'Improvement',artefacts:['Nonconformity & corrective action log']}];
 const ART_CLAUSE={'QMS scope statement':'Cl. 4.3','Context & interested parties analysis':'Cl. 4.1-4.2','Quality policy':'Cl. 5.2','Roles & authorities register':'Cl. 5.3','Risk & opportunities register':'Cl. 6.1','Quality objectives register':'Cl. 6.2','Competence & training framework':'Cl. 7.2','Documented information register':'Cl. 7.5','Process controls summary':'Cl. 8.1','Internal audit programme':'Cl. 9.2','Nonconformity & corrective action log':'Cl. 10.2'};
 const ALL_ARTS=CLAUSES.flatMap(c=>c.artefacts);
-let S={apiKey:'',org:'',desc:'',size:'',industry:'',existingDocs:'none',brandLogo:'',brandColour:'#1D9E75',brandDomain:'',currentClause:0,history:{},artStatus:{},artContent:{},loading:false,tpShown:{},startTime:Date.now()};
+let S={apiKey:'',org:'',desc:'',size:'',industry:'',existingDocs:'none',brandLogo:'',brandColour:'#1D9E75',brandDomain:'',brandGuideName:'',currentClause:0,history:{},artStatus:{},artContent:{},loading:false,tpShown:{},startTime:Date.now()};
 let pendingAttachment=null;
 function save(){try{localStorage.setItem(STORAGE_KEY,JSON.stringify({...S,apiKey:'',loading:false}));}catch(e){}}
 function load(){try{const d=JSON.parse(localStorage.getItem(STORAGE_KEY)||'{}');if(d.org){Object.assign(S,d);return true;}}catch(e){}return false;}
-(function init(){if(load()&&S.org){document.getElementById('resumeBanner').style.display='block';document.getElementById('resumeOrg').textContent=S.org;document.getElementById('orgName').value=S.org;document.getElementById('orgDesc').value=S.desc;document.getElementById('orgSize').value=S.size;document.getElementById('orgIndustry').value=S.industry||'';document.getElementById('brandDomain').value=S.brandDomain||'';selectExisting(S.existingDocs||'none');if(S.brandLogo)showBrandPreview(S.brandLogo,S.brandDomain,S.brandColour);}})();
+(function init(){if(load()&&S.org){document.getElementById('resumeBanner').style.display='block';document.getElementById('resumeOrg').textContent=S.org;document.getElementById('orgName').value=S.org;document.getElementById('orgDesc').value=S.desc;document.getElementById('orgSize').value=S.size;document.getElementById('orgIndustry').value=S.industry||'';document.getElementById('brandDomain').value=S.brandDomain||'';selectExisting(S.existingDocs||'none');if(S.brandLogo)showBrandPreview(S.brandLogo,S.brandDomain||S.brandGuideName,S.brandColour);else if(S.brandGuideName)showBrandPreviewFromGuide(S.brandGuideName,S.brandColour);}})();
+async function handleBrandGuideUpload(event){
+  const file=event.target.files[0];if(!file)return;
+  const processing=document.getElementById('brandUploadProcessing');
+  const statusEl=document.getElementById('brandUploadStatus');
+  const apiKey=document.getElementById('apiKey').value.trim();
+  processing.style.display='flex';
+  statusEl.textContent='Reading your brand guide...';
+  const ext=file.name.split('.').pop().toLowerCase();
+  try{
+    let textContent='';let base64Data='';let isPdf=false;
+    if(ext==='docx'){const arrayBuffer=await file.arrayBuffer();const result=await mammoth.extractRawText({arrayBuffer});textContent=result.value;}
+    else if(ext==='pdf'){base64Data=await fileToBase64(file);isPdf=true;}
+    else{throw new Error('Please upload a PDF or DOCX file.');}
+    statusEl.textContent='Extracting brand colour...';
+    if(!apiKey){processing.style.display='none';S.brandGuideName=file.name;showBrandPreviewFromGuide(file.name,'#1D9E75');document.getElementById('colourFallback').style.display='flex';return;}
+    const sysPr='You are a brand analyst. Read the following brand style guide and extract the primary brand colour as a hex code. Return ONLY valid JSON with no other text: {"hex":"#XXXXXX","orgName":"Company Name if found"}. If you cannot find a hex colour, return {"hex":null,"orgName":null}.';
+    let userContent;
+    if(isPdf){userContent=[{type:'document',source:{type:'base64',media_type:'application/pdf',data:base64Data}},{type:'text',text:'Extract the primary brand colour hex code and organisation name from this brand style guide. Return only JSON.'}];}
+    else{userContent=[{type:'text',text:'Extract the primary brand colour hex code and organisation name from this brand style guide.\n\n'+textContent.substring(0,8000)+'\n\nReturn only JSON.'}];}
+    const res=await fetch('https://api.anthropic.com/v1/messages',{method:'POST',headers:{'Content-Type':'application/json','x-api-key':apiKey,'anthropic-version':'2023-06-01','anthropic-dangerous-direct-browser-access':'true'},body:JSON.stringify({model:'claude-sonnet-4-20250514',max_tokens:200,system:sysPr,messages:[{role:'user',content:userContent}]})});
+    const data=await res.json();
+    if(data.error)throw new Error(data.error.message);
+    const raw=data.content?.[0]?.text||'{}';
+    let parsed={};try{parsed=JSON.parse(raw.replace(/```json|```/g,'').trim());}catch(e){}
+    const hex=parsed.hex&&parsed.hex.startsWith('#')?parsed.hex:'#1D9E75';
+    const orgName=parsed.orgName||'';
+    S.brandColour=hex;S.brandGuideName=file.name;S.brandLogo='';S.brandDomain='';
+    if(orgName&&!document.getElementById('orgName').value)document.getElementById('orgName').value=orgName;
+    processing.style.display='none';
+    showBrandPreviewFromGuide(file.name,hex);
+    document.getElementById('colourFallback').style.display='none';
+  }catch(e){processing.style.display='none';S.brandGuideName=file.name;S.brandColour='#1D9E75';showBrandPreviewFromGuide(file.name,'#1D9E75');document.getElementById('colourFallback').style.display='flex';}
+  event.target.value='';
+}
+function showBrandPreviewFromGuide(fileName,hex){
+  document.getElementById('brandLogo').style.display='none';
+  document.getElementById('brandName').textContent=fileName;
+  document.getElementById('brandUrl').innerHTML='<span class="colour-swatch" style="background:'+hex+'"></span>Brand colour extracted: '+hex;
+  document.getElementById('brandPreview').style.display='flex';
+  S.brandColour=hex;
+}
 async function handleFileSelect(event){
   const file=event.target.files[0];if(!file)return;
   const btn=document.getElementById('attachBtn');
@@ -275,16 +336,10 @@ async function handleFileSelect(event){
   const sizeMB=(file.size/1024/1024).toFixed(1);
   const ext=file.name.split('.').pop().toLowerCase();
   try{
-    if(ext==='pdf'){
-      const base64=await fileToBase64(file);
-      pendingAttachment={name:file.name,type:'pdf',size:sizeMB+'MB',mediaType:'application/pdf',data:base64};
-      document.getElementById('attachIcon').textContent='PDF';
-    }else if(ext==='docx'){
-      const arrayBuffer=await file.arrayBuffer();
-      const result=await mammoth.extractRawText({arrayBuffer});
-      pendingAttachment={name:file.name,type:'docx',size:sizeMB+'MB',text:result.value};
-      document.getElementById('attachIcon').textContent='DOC';
-    }else{throw new Error('Please attach a PDF or DOCX file.');}
+    if(ext==='pdf'){const base64=await fileToBase64(file);pendingAttachment={name:file.name,type:'pdf',size:sizeMB+'MB',mediaType:'application/pdf',data:base64};document.getElementById('attachIcon').textContent='PDF';}
+    else if(ext==='docx'){const arrayBuffer=await file.arrayBuffer();const result=await mammoth.extractRawText({arrayBuffer});pendingAttachment={name:file.name,type:'docx',size:sizeMB+'MB',text:result.value};document.getElementById('attachIcon').textContent='DOC';}
+    else if(ext==='txt'){const text=await file.text();pendingAttachment={name:file.name,type:'docx',size:sizeMB+'MB',text};document.getElementById('attachIcon').textContent='TXT';}
+    else{throw new Error('Please attach a PDF, DOCX, or TXT file.');}
     document.getElementById('attachName').textContent=file.name;
     document.getElementById('attachSize').textContent=sizeMB+'MB';
     document.getElementById('userInput').focus();
@@ -294,13 +349,13 @@ async function handleFileSelect(event){
 }
 function fileToBase64(file){return new Promise((resolve,reject)=>{const reader=new FileReader();reader.onload=()=>{resolve(reader.result.split(',')[1]);};reader.onerror=reject;reader.readAsDataURL(file);});}
 function clearAttachment(){pendingAttachment=null;document.getElementById('attachPreview').classList.remove('visible');document.getElementById('attachName').textContent='';document.getElementById('attachSize').textContent='';document.getElementById('attachIcon').textContent='PDF';document.getElementById('userInput').placeholder='Reply to Trixie... or attach a document with 📎';document.getElementById('fileInput').value='';}
-async function fetchBrand(){const domain=document.getElementById('brandDomain').value.trim();if(!domain)return;const btn=document.getElementById('fetchBtn');btn.disabled=true;btn.textContent='Fetching...';let cleanDomain=domain.replace(/^https?:\/\//,'').replace(/\/.*$/,'');try{const faviconUrl=`https://www.google.com/s2/favicons?domain=${cleanDomain}&sz=64`;const proxyUrl=`https://api.allorigins.win/get?url=${encodeURIComponent('https://'+cleanDomain)}`;const res=await fetch(proxyUrl,{signal:AbortSignal.timeout(6000)});const data=await res.json();let orgName=cleanDomain,colour='#1D9E75';if(data.contents){const titleMatch=data.contents.match(/<title[^>]*>([^<]+)<\/title>/i);if(titleMatch)orgName=titleMatch[1].trim().split('|')[0].trim().split('-')[0].trim();const themeMatch=data.contents.match(/name=["']theme-color["'][^>]*content=["']([^"']+)["']/i)||data.contents.match(/content=["']([^"']+)["'][^>]*name=["']theme-color["']/i);if(themeMatch&&themeMatch[1].startsWith('#'))colour=themeMatch[1];}S.brandLogo=faviconUrl;S.brandColour=colour;S.brandDomain=cleanDomain;showBrandPreview(faviconUrl,orgName||cleanDomain,colour);if(!document.getElementById('orgName').value)document.getElementById('orgName').value=orgName;}catch(e){S.brandLogo=`https://www.google.com/s2/favicons?domain=${cleanDomain}&sz=64`;S.brandDomain=cleanDomain;document.getElementById('colourFallback').style.display='flex';showBrandPreview(S.brandLogo,cleanDomain,S.brandColour);}btn.disabled=false;btn.textContent='Fetch';}
-function showBrandPreview(logoUrl,name,colour){document.getElementById('brandLogo').src=logoUrl;document.getElementById('brandName').textContent=name;document.getElementById('brandUrl').textContent=S.brandDomain;document.getElementById('brandPreview').style.display='flex';}
-function clearBrand(){S.brandLogo='';S.brandDomain='';S.brandColour='#1D9E75';document.getElementById('brandPreview').style.display='none';document.getElementById('brandDomain').value='';document.getElementById('colourFallback').style.display='none';}
-document.getElementById('brandColour').addEventListener('change',function(){S.brandColour=this.value;});
+async function fetchBrand(){const domain=document.getElementById('brandDomain').value.trim();if(!domain)return;const btn=document.getElementById('fetchBtn');btn.disabled=true;btn.textContent='Fetching...';let cleanDomain=domain.replace(/^https?:\/\//,'').replace(/\/.*$/,'');try{const faviconUrl=`https://www.google.com/s2/favicons?domain=${cleanDomain}&sz=64`;const proxyUrl=`https://api.allorigins.win/get?url=${encodeURIComponent('https://'+cleanDomain)}`;const res=await fetch(proxyUrl,{signal:AbortSignal.timeout(6000)});const data=await res.json();let orgName=cleanDomain,colour='#1D9E75';if(data.contents){const titleMatch=data.contents.match(/<title[^>]*>([^<]+)<\/title>/i);if(titleMatch)orgName=titleMatch[1].trim().split('|')[0].trim().split('-')[0].trim();const themeMatch=data.contents.match(/name=["']theme-color["'][^>]*content=["']([^"']+)["']/i)||data.contents.match(/content=["']([^"']+)["'][^>]*name=["']theme-color["']/i);if(themeMatch&&themeMatch[1].startsWith('#'))colour=themeMatch[1];}S.brandLogo=faviconUrl;S.brandColour=colour;S.brandDomain=cleanDomain;S.brandGuideName='';showBrandPreview(faviconUrl,orgName||cleanDomain,colour);if(!document.getElementById('orgName').value)document.getElementById('orgName').value=orgName;}catch(e){S.brandLogo=`https://www.google.com/s2/favicons?domain=${cleanDomain}&sz=64`;S.brandDomain=cleanDomain;S.brandGuideName='';document.getElementById('colourFallback').style.display='flex';showBrandPreview(S.brandLogo,cleanDomain,S.brandColour);}btn.disabled=false;btn.textContent='Fetch';}
+function showBrandPreview(logoUrl,name,colour){document.getElementById('brandLogo').style.display='';document.getElementById('brandLogo').src=logoUrl;document.getElementById('brandName').textContent=name;document.getElementById('brandUrl').textContent=S.brandDomain;document.getElementById('brandPreview').style.display='flex';}
+function clearBrand(){S.brandLogo='';S.brandDomain='';S.brandColour='#1D9E75';S.brandGuideName='';document.getElementById('brandPreview').style.display='none';document.getElementById('brandDomain').value='';document.getElementById('colourFallback').style.display='none';document.getElementById('brandLogo').style.display='';}
+document.getElementById('brandColour').addEventListener('change',function(){S.brandColour=this.value;const preview=document.getElementById('brandUrl');if(preview&&S.brandGuideName)preview.innerHTML='<span class="colour-swatch" style="background:'+this.value+'"></span>Brand colour: '+this.value;});
 function selectExisting(val){S.existingDocs=val;['none','some','all'].forEach(v=>{document.getElementById('opt-'+v).classList.toggle('selected',v===val);});}
 function handleStart(){const key=document.getElementById('apiKey').value.trim();const org=document.getElementById('orgName').value.trim();const desc=document.getElementById('orgDesc').value.trim();const size=document.getElementById('orgSize').value.trim();const industry=document.getElementById('orgIndustry').value.trim();const err=document.getElementById('setupErr');err.textContent='';if(!key){err.textContent='Please enter your Anthropic API key.';return;}if(!key.startsWith('sk-')){err.textContent='API key should start with sk-';return;}if(!org||!desc||!size||!industry){err.textContent='Please fill in all organisation fields.';return;}S.apiKey=key;if(!S.org){S.org=org;S.desc=desc;S.size=size;S.industry=industry;S.existingDocs=S.existingDocs||'none';S.history={};S.artStatus={};S.artContent={};S.tpShown={};S.startTime=Date.now();CLAUSES.forEach(c=>{S.history[c.id]=[];});}if(document.getElementById('colourFallback').style.display!=='none'){S.brandColour=document.getElementById('brandColour').value;}save();showMain();}
-function showMain(){document.getElementById('setupScreen').classList.remove('active');document.getElementById('mainScreen').classList.add('active');document.getElementById('sbOrg').textContent=S.org;if(S.brandLogo){document.getElementById('sbBrand').style.display='flex';document.getElementById('sbLogo').src=S.brandLogo;document.getElementById('sbColour').style.background=S.brandColour;}renderSidebar();renderArtefacts();openClause(S.currentClause||0);}
+function showMain(){document.getElementById('setupScreen').classList.remove('active');document.getElementById('mainScreen').classList.add('active');document.getElementById('sbOrg').textContent=S.org;if(S.brandLogo){document.getElementById('sbBrand').style.display='flex';document.getElementById('sbLogo').src=S.brandLogo;document.getElementById('sbColour').style.background=S.brandColour;}else if(S.brandColour&&S.brandColour!=='#1D9E75'){document.getElementById('sbBrand').style.display='flex';document.getElementById('sbLogo').style.display='none';document.getElementById('sbColour').style.background=S.brandColour;}renderSidebar();renderArtefacts();openClause(S.currentClause||0);}
 function renderSidebar(){const list=document.getElementById('clList');if(!list)return;list.innerHTML=CLAUSES.map((c,i)=>{const done=c.artefacts.filter(a=>S.artStatus[a]==='done').length;const cls=i===S.currentClause?'active':done===c.artefacts.length?'completed':'';return `<div class="cl-item ${cls}" onclick="openClause(${i})"><div class="cl-dot"></div><div class="cl-name">${c.label}<span class="cl-sub">${c.sub}</span></div><div class="cl-ct">${done}/${c.artefacts.length}</div></div>`;}).join('');const done=ALL_ARTS.filter(a=>S.artStatus[a]==='done').length;const pct=Math.round(done/ALL_ARTS.length*100);document.getElementById('progFill').style.width=pct+'%';document.getElementById('progTxt').textContent=`${done} of ${ALL_ARTS.length} documents complete`;const dlAll=document.getElementById('dlAll');if(dlAll)dlAll.style.display=done===ALL_ARTS.length&&window.docxLoaded?'block':'none';}
 function renderArtefacts(){const list=document.getElementById('artList');if(!list)return;list.innerHTML=CLAUSES.map(c=>c.artefacts.map(a=>{const st=S.artStatus[a]||'todo';const stLabel=st==='done'?'Complete':st==='progress'?'In progress':'Not started';const dl=st==='done'&&window.docxLoaded?`<div class="dl-btn" onclick="downloadArt('${a}')">Download .docx</div>`:(st==='done'?'<div class="dl-loading">Preparing download...</div>':'');return `<div class="art-card ${st==='done'?'done':''}"><div class="art-name">${a}</div><div class="art-clause">${ART_CLAUSE[a]||''}</div><div class="art-st ${st}">${stLabel}</div>${dl}</div>`;}).join('')).join('');}
 function openClause(idx){S.currentClause=idx;save();const c=CLAUSES[idx];document.getElementById('tbTitle').textContent=`${c.label} - ${c.sub}`;document.getElementById('tbSub').textContent=c.artefacts.join(' - ');const allDone=c.artefacts.every(a=>S.artStatus[a]==='done');const badge=document.getElementById('tbBadge');badge.textContent=allDone?'Complete':'In progress';badge.className='tb-badge '+(allDone?'done':'progress');renderSidebar();renderMsgs();if(!S.history[c.id]||S.history[c.id].length===0){if(!S.history[c.id])S.history[c.id]=[];S.history[c.id].push({role:'assistant',content:greeting(c.id)});save();renderMsgs();}}
