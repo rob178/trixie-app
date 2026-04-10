@@ -1,0 +1,53 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Payment successful — Trixie</title>
+<style>
+@import url('https://fonts.googleapis.com/css2?family=DM+Serif+Display&family=DM+Sans:opsz,wght@9..40,400;9..40,500;9..40,600&display=swap');
+*{box-sizing:border-box;margin:0;padding:0}
+:root{--teal:#1D9E75;--teal-dark:#0F6E56;--teal-lite:#E1F5EE;--ink:#0D1F1A;--gray:#5F5E5A;--border:#E0E8E4;--serif:'DM Serif Display',serif;--sans:'DM Sans',sans-serif;}
+body{font-family:var(--sans);background:var(--ink);color:white;min-height:100vh;display:flex;align-items:center;justify-content:center;padding:2rem}
+.card{background:white;border-radius:16px;padding:3rem;max-width:520px;width:100%;text-align:center;color:var(--ink)}
+.tick-circle{width:72px;height:72px;border-radius:50%;background:var(--teal-lite);display:flex;align-items:center;justify-content:center;margin:0 auto 1.5rem}
+.tick-circle svg{width:36px;height:36px;stroke:var(--teal);stroke-width:2.5;fill:none}
+.logo{font-family:var(--serif);font-size:28px;color:var(--teal);margin-bottom:1rem}
+h1{font-family:var(--serif);font-size:28px;color:var(--ink);margin-bottom:0.75rem;line-height:1.25}
+.sub{font-size:14px;color:var(--gray);line-height:1.7;margin-bottom:2rem}
+.what-next{background:#F4F7F5;border-radius:10px;padding:1.25rem;margin-bottom:1.5rem;text-align:left}
+.what-next h3{font-size:13px;font-weight:600;color:var(--ink);margin-bottom:10px}
+.what-next-item{display:flex;gap:10px;align-items:flex-start;margin-bottom:8px;font-size:13px;color:var(--gray);line-height:1.5}
+.what-next-item:last-child{margin-bottom:0}
+.num{width:20px;height:20px;border-radius:50%;background:var(--teal);color:white;font-size:10px;font-weight:600;display:flex;align-items:center;justify-content:center;flex-shrink:0;margin-top:1px}
+.btn{display:block;width:100%;padding:14px;background:var(--teal);color:white;border:none;border-radius:10px;font-size:15px;font-weight:600;cursor:pointer;font-family:var(--sans);text-decoration:none;margin-bottom:10px}
+.btn:hover{background:var(--teal-dark)}
+.receipt-note{font-size:12px;color:#aaa;margin-top:0.75rem}
+</style>
+</head>
+<body>
+<div class="card">
+  <div class="logo">Trixie</div>
+  <div class="tick-circle">
+    <svg viewBox="0 0 24 24"><polyline points="4,12 9,17 20,6"/></svg>
+  </div>
+  <h1>Payment successful!</h1>
+  <div class="sub">Welcome to Trixie. Your ISO 9001 certification journey starts right now. You'll have a complete, audit-ready document pack before you know it.</div>
+  <div class="what-next">
+    <h3>Here's what happens next</h3>
+    <div class="what-next-item"><div class="num">1</div><div>Click the button below to open Trixie</div></div>
+    <div class="what-next-item"><div class="num">2</div><div>Get your free Anthropic API key at console.anthropic.com — takes 5 minutes</div></div>
+    <div class="what-next-item"><div class="num">3</div><div>Enter your organisation details and let Trixie guide you through each clause</div></div>
+    <div class="what-next-item"><div class="num">4</div><div>Download your complete document pack when all 11 are generated</div></div>
+  </div>
+  <a class="btn" href="/app.html">Open Trixie now</a>
+  <div class="receipt-note">A receipt has been sent to your email by Stripe. Questions? Email hello@gettrixie.com</div>
+</div>
+<script>
+localStorage.setItem('trixie_paid','true');
+const params=new URLSearchParams(window.location.search);
+const sessionId=params.get('session_id');
+if(sessionId)localStorage.setItem('trixie_stripe_session',sessionId);
+</script>
+</body>
+</html>

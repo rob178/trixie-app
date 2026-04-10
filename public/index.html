@@ -4,602 +4,225 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Trixie — ISO 9001 Certification Guide</title>
-<meta name="description" content="Get your ISO 9001:2015 document pack without a consultant. Trixie guides you through every clause and generates all 11 audit-ready documents.">
-<script src="https://unpkg.com/docx@8.5.0/build/index.js"></script>
-<script src="https://unpkg.com/jszip@3.10.1/dist/jszip.min.js"></script>
+<meta name="description" content="Get your ISO 9001:2015 document pack without a consultant. Trixie guides you through every clause and generates all 11 audit-ready documents for $797.">
 <style>
 @import url('https://fonts.googleapis.com/css2?family=DM+Serif+Display:ital@0;1&family=DM+Sans:opsz,wght@9..40,300;9..40,400;9..40,500;9..40,600&display=swap');
 *{box-sizing:border-box;margin:0;padding:0}
-:root{
-  --teal:#1D9E75;--teal-dark:#0F6E56;--teal-lite:#E1F5EE;--teal-mid:#5DCAA5;
-  --ink:#0D1F1A;--fog:#F4F7F5;--mist:#EAF3EE;--white:#FFFFFF;
-  --gray:#5F5E5A;--border:#E0E8E4;--danger:#E24B4A;
-  --serif:'DM Serif Display',serif;--sans:'DM Sans',sans-serif;
-}
-body{font-family:var(--sans);background:var(--fog);color:var(--ink);height:100vh;overflow:hidden}
-.app{height:100vh;display:flex;flex-direction:column;overflow:hidden}
-.screen{display:none;flex:1;flex-direction:column;overflow:hidden}
-.screen.active{display:flex}
-.setup{align-items:center;justify-content:center;padding:1.5rem;background:var(--fog);overflow-y:auto;flex:1}
-.setup-card{width:100%;max-width:540px;border:1px solid var(--border);border-radius:16px;background:var(--white);overflow:hidden}
-.setup-hero{background:var(--ink);padding:2rem;text-align:center}
-.setup-logo{font-family:var(--serif);font-size:48px;color:var(--teal);line-height:1;margin-bottom:6px}
-.setup-tagline{font-size:13px;color:rgba(255,255,255,0.6);line-height:1.5}
-.setup-body{padding:1.75rem}
-.setup-section{margin-bottom:1.25rem}
-.setup-section-title{font-size:11px;font-weight:600;letter-spacing:0.08em;text-transform:uppercase;color:var(--teal-dark);margin-bottom:10px;padding-bottom:6px;border-bottom:1px solid var(--border)}
-.field{margin-bottom:0.875rem}
-.lbl{font-size:12px;color:var(--gray);margin-bottom:4px;display:block;font-weight:500}
-.lbl span{font-weight:400;color:#aaa}
-.inp{width:100%;font-size:13px;padding:9px 11px;border:1px solid var(--border);border-radius:8px;background:var(--white);color:var(--ink);outline:none;transition:border-color 0.15s}
-.inp:focus{border-color:var(--teal)}
-.api-guide{background:var(--mist);border:1px solid var(--teal-mid);border-radius:8px;padding:12px 14px;margin-bottom:12px}
-.api-guide-title{font-size:11px;font-weight:600;color:var(--teal-dark);margin-bottom:8px}
-.api-guide-steps{display:flex;flex-direction:column;gap:5px}
-.api-step{display:flex;align-items:flex-start;gap:8px;font-size:12px;color:var(--ink);line-height:1.5}
-.api-step-num{width:18px;height:18px;border-radius:50%;background:var(--teal);color:white;font-size:10px;font-weight:600;display:flex;align-items:center;justify-content:center;flex-shrink:0;margin-top:1px}
-.api-cost{font-size:11px;color:var(--teal-dark);background:var(--teal-lite);border-radius:6px;padding:6px 10px;margin-top:8px}
-.brand-fetch-row{display:flex;gap:8px;align-items:flex-start}
-.brand-fetch-row .inp{flex:1}
-.fetch-btn{padding:9px 14px;background:var(--teal);color:white;border:none;border-radius:8px;font-size:12px;font-weight:500;cursor:pointer;white-space:nowrap;flex-shrink:0}
-.fetch-btn:hover{background:var(--teal-dark)}
-.fetch-btn:disabled{background:var(--border);color:#aaa;cursor:not-allowed}
-.brand-preview{display:none;align-items:center;gap:10px;padding:8px 10px;background:var(--fog);border:1px solid var(--border);border-radius:8px;margin-top:6px}
-.brand-preview img{width:28px;height:28px;border-radius:4px;object-fit:contain}
-.brand-preview-name{font-size:12px;font-weight:500;color:var(--ink)}
-.brand-preview-url{font-size:11px;color:var(--gray)}
-.brand-preview-clear{margin-left:auto;font-size:11px;color:var(--danger);cursor:pointer;border:none;background:none;padding:0}
-.colour-fallback{display:none;gap:10px;align-items:center;margin-top:6px}
-.colour-fallback label{font-size:12px;color:var(--gray)}
-.colour-fallback input[type=color]{width:36px;height:28px;border:1px solid var(--border);border-radius:6px;cursor:pointer;padding:2px}
-.existing-opts{display:flex;flex-direction:column;gap:6px}
-.existing-opt{display:flex;align-items:flex-start;gap:10px;padding:10px 12px;border:1px solid var(--border);border-radius:8px;cursor:pointer;transition:all 0.15s}
-.existing-opt:hover{border-color:var(--teal-mid);background:var(--mist)}
-.existing-opt.selected{border-color:var(--teal);background:var(--teal-lite)}
-.existing-opt-dot{width:16px;height:16px;border-radius:50%;border:2px solid var(--border);flex-shrink:0;margin-top:2px;transition:all 0.15s}
-.existing-opt.selected .existing-opt-dot{border-color:var(--teal);background:var(--teal)}
-.existing-opt-text h4{font-size:13px;font-weight:500;color:var(--ink);margin-bottom:2px}
-.existing-opt-text p{font-size:11px;color:var(--gray);line-height:1.4}
-.btn-start{width:100%;padding:12px;background:var(--teal);color:white;border:none;border-radius:10px;font-size:14px;font-weight:600;cursor:pointer;margin-top:4px;font-family:var(--sans);transition:background 0.15s}
-.btn-start:hover{background:var(--teal-dark)}
-.btn-start:disabled{background:var(--border);color:#aaa;cursor:not-allowed}
-.err-msg{font-size:12px;color:var(--danger);margin-top:8px;min-height:16px}
-.resume-banner{background:var(--teal-lite);border:1px solid var(--teal-mid);border-radius:8px;padding:10px 12px;margin-bottom:1rem;font-size:12px;color:var(--teal-dark);display:none;line-height:1.5}
-.resume-banner strong{font-weight:600}
-.main{flex:1;display:flex;overflow:hidden}
-.sidebar{width:220px;border-right:1px solid var(--border);background:var(--white);display:flex;flex-direction:column;flex-shrink:0}
-.sb-head{padding:14px 16px 10px;border-bottom:1px solid var(--border)}
-.sb-logo{font-family:var(--serif);font-size:18px;color:var(--teal)}
-.sb-org{font-size:11px;color:var(--gray);margin-top:2px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
-.sb-brand{display:flex;align-items:center;gap:6px;margin-top:4px}
-.sb-brand img{width:16px;height:16px;border-radius:3px;object-fit:contain}
-.sb-brand-colour{width:12px;height:12px;border-radius:50%;flex-shrink:0}
-.sb-prog{padding:10px 16px 8px;border-bottom:1px solid var(--border)}
-.prog-lbl{font-size:10px;color:var(--gray);margin-bottom:4px;font-weight:500}
-.prog-bar{height:4px;background:var(--border);border-radius:2px;overflow:hidden}
-.prog-fill{height:4px;background:var(--teal);border-radius:2px;width:0%;transition:width 0.5s}
-.prog-txt{font-size:10px;color:var(--teal-dark);margin-top:3px;font-weight:500}
-.cl-list{flex:1;overflow-y:auto;padding:6px 0}
-.cl-item{display:flex;align-items:center;gap:8px;padding:8px 16px;cursor:pointer;font-size:12px;color:var(--gray);border-left:2px solid transparent;transition:all 0.1s;line-height:1.3}
-.cl-item:hover{background:var(--fog)}
-.cl-item.active{background:var(--mist);color:var(--ink);border-left-color:var(--teal)}
-.cl-item.completed{color:var(--ink)}
-.cl-dot{width:7px;height:7px;border-radius:50%;background:var(--border);flex-shrink:0;transition:background 0.3s}
-.cl-item.active .cl-dot,.cl-item.completed .cl-dot{background:var(--teal)}
-.cl-name{flex:1}
-.cl-sub{font-size:10px;opacity:0.6;display:block}
-.cl-ct{font-size:10px;color:#bbb;flex-shrink:0}
-.sb-foot{padding:10px 16px;border-top:1px solid var(--border)}
-.reset-btn{font-size:11px;color:#ccc;cursor:pointer;background:none;border:none;padding:0;font-family:var(--sans)}
-.reset-btn:hover{color:var(--danger)}
-.workspace{flex:1;display:flex;flex-direction:column;overflow:hidden}
-.topbar{padding:11px 18px;border-bottom:1px solid var(--border);display:flex;align-items:center;justify-content:space-between;flex-shrink:0;background:var(--white)}
-.tb-title{font-size:14px;font-weight:600;color:var(--ink)}
-.tb-sub{font-size:11px;color:var(--gray);margin-top:1px}
-.tb-badge{font-size:10px;padding:3px 10px;border-radius:20px;font-weight:500}
-.tb-badge.progress{background:var(--teal-lite);color:var(--teal-dark)}
-.tb-badge.done{background:#E8F5E9;color:#2E7D32}
-.panels{flex:1;display:flex;overflow:hidden}
-.chat-area{flex:1;display:flex;flex-direction:column;overflow:hidden;background:var(--white)}
-.msgs{flex:1;overflow-y:auto;padding:16px 18px;display:flex;flex-direction:column;gap:12px}
-.msg-wrap{display:flex;flex-direction:column;max-width:88%}
-.msg-wrap.user{align-self:flex-end;align-items:flex-end}
-.msg-wrap.trixie{align-self:flex-start;align-items:flex-start}
-.msg-sender{font-size:10px;color:#bbb;margin-bottom:3px}
-.bubble{padding:10px 13px;font-size:13px;line-height:1.65;border-radius:12px}
-.bubble.trixie{background:var(--fog);color:var(--ink);border-radius:3px 12px 12px 12px}
-.bubble.user{background:var(--teal);color:white;border-radius:12px 3px 12px 12px}
-.bubble.thinking{color:#aaa;font-style:italic;background:var(--fog)}
-.bubble.milestone{background:var(--mist);border:1px solid var(--teal-mid);color:var(--teal-dark);border-radius:3px 12px 12px 12px}
-.bubble.awareness{background:#FFFDE7;border:1px solid #F9A825;color:#5D4037;border-radius:3px 12px 12px 12px}
-.tp-nudge{margin-top:6px;background:var(--white);border:1px solid var(--border);border-radius:10px;padding:12px 14px;max-width:88%}
-.tp-nudge-title{font-size:12px;font-weight:600;color:var(--ink);margin-bottom:4px}
-.tp-nudge-body{font-size:12px;color:var(--gray);line-height:1.5;margin-bottom:10px}
-.tp-nudge-stars{font-size:18px;color:#00B67A;letter-spacing:2px;margin-bottom:8px}
-.tp-nudge-btns{display:flex;gap:8px}
-.tp-review-btn{padding:7px 14px;background:#00B67A;color:white;border:none;border-radius:6px;font-size:12px;font-weight:500;cursor:pointer;text-decoration:none;display:inline-block}
-.tp-skip-btn{padding:7px 10px;background:transparent;color:var(--gray);border:1px solid var(--border);border-radius:6px;font-size:12px;cursor:pointer}
-.art-chip{margin-top:6px;display:inline-flex;align-items:center;gap:6px;padding:6px 12px;background:var(--teal-lite);border:1px solid var(--teal-mid);border-radius:20px;font-size:11px;color:var(--teal-dark);cursor:pointer;font-weight:500}
-.art-chip:hover{background:#c8ede0}
-.input-bar{padding:12px 16px;border-top:1px solid var(--border);display:flex;gap:8px;align-items:center;flex-shrink:0;background:var(--white)}
-.input-bar input{flex:1;font-size:13px;padding:9px 12px;border:1px solid var(--border);border-radius:8px;background:var(--white);color:var(--ink);outline:none;font-family:var(--sans)}
-.input-bar input:focus{border-color:var(--teal)}
-.send-btn{padding:9px 16px;background:var(--teal);color:white;border:none;border-radius:8px;font-size:13px;font-weight:500;cursor:pointer;font-family:var(--sans)}
-.send-btn:disabled{background:var(--border);color:#aaa;cursor:not-allowed}
-.art-panel{width:210px;border-left:1px solid var(--border);display:flex;flex-direction:column;overflow:hidden;flex-shrink:0;background:var(--fog)}
-.art-head{padding:12px 14px 8px;border-bottom:1px solid var(--border);font-size:11px;font-weight:600;color:var(--gray);flex-shrink:0;text-transform:uppercase;letter-spacing:0.06em}
-.art-list{flex:1;overflow-y:auto;padding:8px}
-.art-card{padding:9px 10px;border:1px solid var(--border);border-radius:8px;background:var(--white);margin-bottom:6px;transition:border-color 0.2s}
-.art-card.done{border-color:var(--teal-mid)}
-.art-name{font-size:11px;font-weight:600;color:var(--ink);line-height:1.3}
-.art-clause{font-size:10px;color:#aaa;margin-top:1px}
-.art-st{font-size:10px;margin-top:5px;font-weight:500}
-.art-st.done{color:var(--teal-dark)}
-.art-st.progress{color:#BA7517}
-.art-st.todo{color:#ccc}
-.dl-btn{display:inline-block;margin-top:5px;font-size:10px;padding:4px 9px;border:1px solid var(--teal);color:var(--teal-dark);border-radius:20px;cursor:pointer;background:transparent;font-weight:500;font-family:var(--sans)}
-.dl-btn:hover{background:var(--teal-lite)}
-.dl-all{width:calc(100% - 16px);margin:0 8px 10px;padding:8px;background:var(--teal);color:white;border:none;border-radius:8px;font-size:11px;font-weight:500;cursor:pointer;display:none;font-family:var(--sans)}
-.dl-all:hover{background:var(--teal-dark)}
-::-webkit-scrollbar{width:4px}
-::-webkit-scrollbar-track{background:transparent}
-::-webkit-scrollbar-thumb{background:var(--border);border-radius:2px}
+:root{--teal:#1D9E75;--teal-dark:#0F6E56;--teal-lite:#E1F5EE;--teal-mid:#5DCAA5;--ink:#0D1F1A;--fog:#F4F7F5;--mist:#EAF3EE;--white:#FFFFFF;--gray:#5F5E5A;--border:#E0E8E4;--serif:'DM Serif Display',serif;--sans:'DM Sans',sans-serif;}
+body{font-family:var(--sans);background:var(--white);color:var(--ink);line-height:1.6}
+a{color:inherit;text-decoration:none}
+nav{padding:16px 5%;display:flex;align-items:center;justify-content:space-between;border-bottom:1px solid var(--border);position:sticky;top:0;background:var(--white);z-index:100}
+.nav-logo{font-family:var(--serif);font-size:24px;color:var(--teal)}
+.nav-cta{padding:9px 20px;background:var(--teal);color:white;border-radius:8px;font-size:13px;font-weight:500;cursor:pointer;border:none;font-family:var(--sans)}
+.nav-cta:hover{background:var(--teal-dark)}
+.hero{padding:5rem 5% 4rem;background:var(--ink);position:relative;overflow:hidden}
+.hero-grid{position:absolute;inset:0;opacity:0.05;background-image:repeating-linear-gradient(0deg,transparent,transparent 40px,#1D9E75 40px,#1D9E75 41px),repeating-linear-gradient(90deg,transparent,transparent 40px,#1D9E75 40px,#1D9E75 41px)}
+.hero-inner{max-width:800px;margin:0 auto;position:relative}
+.hero-tag{display:inline-block;font-size:11px;font-weight:600;letter-spacing:0.1em;text-transform:uppercase;color:var(--teal-mid);border:1px solid var(--teal-dark);padding:5px 14px;border-radius:20px;margin-bottom:1.5rem}
+.hero-logo{font-family:var(--serif);font-size:80px;color:var(--teal);line-height:1;margin-bottom:8px}
+.hero-headline{font-family:var(--serif);font-size:36px;color:white;line-height:1.25;margin-bottom:1rem;max-width:620px}
+.hero-headline em{font-style:italic;color:var(--teal-mid)}
+.hero-sub{font-size:16px;color:rgba(255,255,255,0.65);max-width:540px;line-height:1.75;margin-bottom:2.5rem}
+.hero-actions{display:flex;align-items:center;gap:20px;flex-wrap:wrap}
+.btn-hero{padding:14px 32px;background:var(--teal);color:white;border:none;border-radius:10px;font-size:15px;font-weight:600;cursor:pointer;font-family:var(--sans);text-decoration:none;display:inline-block}
+.btn-hero:hover{background:var(--teal-dark)}
+.hero-price{font-size:13px;color:rgba(255,255,255,0.5);line-height:1.5}
+.hero-price strong{color:white}
+.section{padding:4rem 5%}
+.section-inner{max-width:860px;margin:0 auto}
+.section-tag{font-size:11px;font-weight:600;letter-spacing:0.1em;text-transform:uppercase;color:var(--teal);margin-bottom:0.75rem}
+.section-headline{font-family:var(--serif);font-size:32px;color:var(--ink);margin-bottom:1rem;line-height:1.25}
+.section-sub{font-size:15px;color:var(--gray);max-width:600px;line-height:1.75;margin-bottom:2rem}
+.problem{background:var(--fog);border-top:3px solid var(--teal)}
+.pain-grid{display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-top:1.5rem}
+@media(max-width:600px){.pain-grid{grid-template-columns:1fr}}
+.pain-card{background:var(--white);border:1px solid var(--border);border-radius:10px;padding:18px}
+.pain-icon{font-size:22px;margin-bottom:8px}
+.pain-card h4{font-size:14px;font-weight:600;color:var(--ink);margin-bottom:4px}
+.pain-card p{font-size:13px;color:var(--gray);line-height:1.6}
+.steps{display:flex;flex-direction:column;gap:0;margin-top:1.5rem}
+.step{display:flex;gap:20px;padding:20px 0;border-bottom:1px solid var(--border)}
+.step:last-child{border-bottom:none}
+.step-num{width:40px;height:40px;border-radius:50%;background:var(--teal);color:white;font-family:var(--serif);font-size:20px;display:flex;align-items:center;justify-content:center;flex-shrink:0;margin-top:2px}
+.step h3{font-size:15px;font-weight:600;color:var(--ink);margin-bottom:4px}
+.step p{font-size:14px;color:var(--gray);line-height:1.65}
+.artefacts{background:var(--mist)}
+.art-grid{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-top:1.5rem}
+@media(max-width:600px){.art-grid{grid-template-columns:1fr}}
+.art-item{background:var(--white);border:1px solid #CCE5D8;border-radius:8px;padding:11px 13px;display:flex;align-items:flex-start;gap:10px}
+.art-tick{width:20px;height:20px;border-radius:50%;background:var(--teal);display:flex;align-items:center;justify-content:center;flex-shrink:0;margin-top:1px}
+.art-tick svg{width:10px;height:10px;stroke:white;stroke-width:2.5;fill:none}
+.art-item-name{font-size:12px;font-weight:600;color:var(--ink);line-height:1.4}
+.art-item-clause{font-size:10px;color:var(--teal-dark);font-weight:600;margin-top:2px}
+.art-zip{background:var(--teal);border-color:var(--teal)}
+.art-zip .art-item-name{color:white}
+.art-zip .art-item-clause{color:rgba(255,255,255,0.75)}
+.art-note{margin-top:1.25rem;font-size:13px;color:var(--gray);font-style:italic}
+.compare-table{width:100%;border-collapse:collapse;margin-top:1.5rem}
+.compare-table th{font-size:12px;font-weight:600;letter-spacing:0.06em;text-transform:uppercase;padding:10px 16px;text-align:left}
+.compare-table th:first-child{color:#aaa;width:36%}
+.compare-table th.col-consultant{background:#FDF5EE;color:#8A6A4A;border-radius:8px 8px 0 0}
+.compare-table th.col-trixie{background:var(--teal);color:white;border-radius:8px 8px 0 0}
+.compare-table td{font-size:13px;padding:10px 16px;border-bottom:1px solid var(--border);vertical-align:middle}
+.compare-table td:first-child{color:var(--gray);font-weight:500}
+.compare-table td.consultant{background:#FDF9F6;color:#5A4030}
+.compare-table td.trixie{background:#F0FBF5;color:var(--teal-dark);font-weight:500}
+.compare-table tr:last-child td{border-bottom:none}
+.who{background:var(--fog)}
+.who-grid{display:grid;grid-template-columns:1fr 1fr 1fr;gap:12px;margin-top:1.5rem}
+@media(max-width:700px){.who-grid{grid-template-columns:1fr 1fr}}
+@media(max-width:480px){.who-grid{grid-template-columns:1fr}}
+.who-card{background:var(--white);border:1px solid var(--border);border-radius:10px;padding:18px}
+.who-tag{display:inline-block;font-size:10px;font-weight:600;letter-spacing:0.08em;text-transform:uppercase;background:var(--teal-lite);color:var(--teal-dark);padding:3px 8px;border-radius:20px;margin-bottom:10px}
+.who-card h3{font-size:13px;font-weight:600;color:var(--ink);margin-bottom:6px}
+.who-card p{font-size:12px;color:var(--gray);line-height:1.6}
+.quote-section{background:var(--ink);padding:4rem 5%}
+.quote-inner{max-width:700px;margin:0 auto}
+.quote-text{font-family:var(--serif);font-size:26px;color:white;line-height:1.4;margin-bottom:1rem}
+.quote-text em{color:var(--teal-mid);font-style:italic}
+.quote-body{font-size:14px;color:rgba(255,255,255,0.55);line-height:1.7;max-width:580px}
+.cta-section{background:var(--teal);padding:4rem 5%;text-align:center}
+.cta-inner{max-width:600px;margin:0 auto}
+.cta-headline{font-family:var(--serif);font-size:36px;color:white;margin-bottom:0.75rem;line-height:1.2}
+.cta-sub{font-size:15px;color:rgba(255,255,255,0.8);margin-bottom:2rem;line-height:1.7}
+.cta-price-row{display:flex;align-items:center;justify-content:center;gap:20px;margin-bottom:2rem;flex-wrap:wrap}
+.cta-amount{font-family:var(--serif);font-size:52px;color:white;line-height:1}
+.cta-details p{font-size:13px;color:rgba(255,255,255,0.75);line-height:1.6;text-align:left}
+.cta-details strong{color:white}
+.btn-cta{padding:16px 40px;background:var(--ink);color:white;border:none;border-radius:10px;font-size:16px;font-weight:600;cursor:pointer;font-family:var(--sans);text-decoration:none;display:inline-block}
+.btn-cta:hover{background:#1a3530}
+.cta-trust{margin-top:1.25rem;font-size:12px;color:rgba(255,255,255,0.5)}
+footer{background:var(--ink);padding:1.5rem 5%;display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:12px}
+.footer-logo{font-family:var(--serif);font-size:20px;color:var(--teal)}
+.footer-links{display:flex;gap:20px}
+.footer-links a{font-size:12px;color:rgba(255,255,255,0.4)}
+.footer-links a:hover{color:rgba(255,255,255,0.7)}
+.footer-copy{font-size:11px;color:rgba(255,255,255,0.3)}
 </style>
 </head>
 <body>
-<div class="app" id="app">
-<div class="screen active" id="setupScreen">
-<div class="setup">
-<div class="setup-card">
-  <div class="setup-hero">
-    <div class="setup-logo">Trixie</div>
-    <div class="setup-tagline">ISO 9001:2015 Certification Guide<br>Your complete audit-ready document pack, generated by AI</div>
-  </div>
-  <div class="setup-body">
-    <div class="resume-banner" id="resumeBanner">
-      <strong>Welcome back!</strong> Found a previous session for <span id="resumeOrg"></span>. Enter your API key to pick up where you left off.
-    </div>
-    <div class="setup-section">
-      <div class="setup-section-title">Your Anthropic API Key</div>
-      <div class="api-guide">
-        <div class="api-guide-title">How to get your free API key — takes 5 minutes</div>
-        <div class="api-guide-steps">
-          <div class="api-step"><div class="api-step-num">1</div><div>Go to <strong><a href="https://console.anthropic.com" target="_blank" style="color:var(--teal-dark)">console.anthropic.com</a></strong> and create a free account</div></div>
-          <div class="api-step"><div class="api-step-num">2</div><div>Click <strong>API Keys</strong> in the left sidebar</div></div>
-          <div class="api-step"><div class="api-step-num">3</div><div>Click <strong>Create Key</strong>, name it "Trixie", copy it immediately</div></div>
-          <div class="api-step"><div class="api-step-num">4</div><div>Paste it below — it starts with <strong>sk-ant-</strong></div></div>
-        </div>
-        <div class="api-cost">💡 No Claude Pro subscription needed. A complete Trixie session costs roughly <strong>$0.50–$2.00 AUD</strong> in API usage — billed to your Anthropic account separately.</div>
-      </div>
-      <div class="field">
-        <label class="lbl">API key</label>
-        <input class="inp" type="password" id="apiKey" placeholder="sk-ant-..." autocomplete="off"/>
-      </div>
-    </div>
-    <div class="setup-section">
-      <div class="setup-section-title">Your Organisation</div>
-      <div class="field">
-        <label class="lbl">Organisation name</label>
-        <input class="inp" type="text" id="orgName" placeholder="Acme Pty Ltd"/>
-      </div>
-      <div class="field">
-        <label class="lbl">What does your organisation do?</label>
-        <input class="inp" type="text" id="orgDesc" placeholder="e.g. Engineering consulting for government clients"/>
-      </div>
-      <div class="field">
-        <label class="lbl">Number of employees</label>
-        <input class="inp" type="text" id="orgSize" placeholder="e.g. 25"/>
-      </div>
-      <div class="field">
-        <label class="lbl">Industry / sector</label>
-        <input class="inp" type="text" id="orgIndustry" placeholder="e.g. Defence, Construction, Healthcare"/>
-      </div>
-    </div>
-    <div class="setup-section">
-      <div class="setup-section-title">Your Branding <span style="font-weight:400;text-transform:none;letter-spacing:0">(optional — adds your logo to documents)</span></div>
-      <div class="field">
-        <label class="lbl">Your website <span>(we'll pull your logo automatically)</span></label>
-        <div class="brand-fetch-row">
-          <input class="inp" type="text" id="brandDomain" placeholder="e.g. acme.com.au"/>
-          <button class="fetch-btn" id="fetchBtn" onclick="fetchBrand()">Fetch</button>
-        </div>
-        <div class="brand-preview" id="brandPreview">
-          <img id="brandLogo" src="" alt="logo"/>
-          <div>
-            <div class="brand-preview-name" id="brandName"></div>
-            <div class="brand-preview-url" id="brandUrl"></div>
-          </div>
-          <button class="brand-preview-clear" onclick="clearBrand()">x Clear</button>
-        </div>
-        <div class="colour-fallback" id="colourFallback">
-          <label>Pick your brand colour:</label>
-          <input type="color" id="brandColour" value="#1D9E75"/>
-        </div>
-      </div>
-    </div>
-    <div class="setup-section">
-      <div class="setup-section-title">Existing Documentation</div>
-      <div class="existing-opts">
-        <div class="existing-opt selected" id="opt-none" onclick="selectExisting('none')">
-          <div class="existing-opt-dot"></div>
-          <div class="existing-opt-text">
-            <h4>Starting from scratch</h4>
-            <p>No existing quality documentation. Build everything fresh.</p>
-          </div>
-        </div>
-        <div class="existing-opt" id="opt-some" onclick="selectExisting('some')">
-          <div class="existing-opt-dot"></div>
-          <div class="existing-opt-text">
-            <h4>We have some documentation</h4>
-            <p>Informal processes, some policies, or partial documentation. Trixie will incorporate what exists.</p>
-          </div>
-        </div>
-        <div class="existing-opt" id="opt-all" onclick="selectExisting('all')">
-          <div class="existing-opt-dot"></div>
-          <div class="existing-opt-text">
-            <h4>We have most documentation</h4>
-            <p>Mostly there. Trixie will identify gaps and generate only what's missing.</p>
-          </div>
-        </div>
-      </div>
-    </div>
-    <button class="btn-start" id="startBtn" onclick="handleStart()">Start my certification journey</button>
-    <div class="err-msg" id="setupErr"></div>
-  </div>
-</div>
-</div>
-</div>
-<div class="screen" id="mainScreen">
-<div class="main">
-  <div class="sidebar">
-    <div class="sb-head">
-      <div class="sb-logo">Trixie</div>
-      <div class="sb-org" id="sbOrg"></div>
-      <div class="sb-brand" id="sbBrand" style="display:none">
-        <img id="sbLogo" src="" alt="logo"/>
-        <div class="sb-brand-colour" id="sbColour"></div>
-      </div>
-    </div>
-    <div class="sb-prog">
-      <div class="prog-lbl">Audit readiness</div>
-      <div class="prog-bar"><div class="prog-fill" id="progFill"></div></div>
-      <div class="prog-txt" id="progTxt">0 of 11 documents complete</div>
-    </div>
-    <div class="cl-list" id="clList"></div>
-    <div class="sb-foot">
-      <button class="reset-btn" onclick="resetSession()">Clear session and start over</button>
-    </div>
-  </div>
-  <div class="workspace">
-    <div class="topbar">
-      <div>
-        <div class="tb-title" id="tbTitle"></div>
-        <div class="tb-sub" id="tbSub"></div>
-      </div>
-      <div class="tb-badge progress" id="tbBadge">In progress</div>
-    </div>
-    <div class="panels">
-      <div class="chat-area">
-        <div class="msgs" id="msgs"></div>
-        <div class="input-bar">
-          <input type="text" id="userInput" placeholder="Reply to Trixie..." onkeydown="if(event.key==='Enter'&&!event.shiftKey)sendMsg()"/>
-          <button class="send-btn" id="sendBtn" onclick="sendMsg()">Send</button>
-        </div>
-      </div>
-      <div class="art-panel">
-        <div class="art-head">Document pack</div>
-        <div class="art-list" id="artList"></div>
-        <button class="dl-all" id="dlAll" onclick="downloadAll()">Download full pack (.zip)</button>
-      </div>
+<nav>
+  <div class="nav-logo">Trixie</div>
+  <a class="nav-cta" href="https://buy.stripe.com/test_fZudR9dlicvNdj57jygbm00">Get started — $797</a>
+</nav>
+<div class="hero">
+  <div class="hero-grid"></div>
+  <div class="hero-inner">
+    <div class="hero-tag">ISO 9001:2015 Certification Guide</div>
+    <div class="hero-logo">Trixie</div>
+    <div class="hero-headline">Your ISO 9001 certification,<br><em>without the consultant.</em></div>
+    <div class="hero-sub">Trixie guides you through every clause of the standard, asks the right questions, and generates your complete audit-ready document pack — in days, not months.</div>
+    <div class="hero-actions">
+      <a class="btn-hero" href="https://buy.stripe.com/test_fZudR9dlicvNdj57jygbm00">Get my document pack</a>
+      <div class="hero-price"><strong>$797 AUD</strong> — one-time payment<br>vs $15,000–$25,000 for a consultant</div>
     </div>
   </div>
 </div>
+<div class="section problem">
+  <div class="section-inner">
+    <div class="section-tag">The problem</div>
+    <div class="section-headline">ISO 9001 shouldn't require a consultant.</div>
+    <div class="section-sub">Every year, thousands of Australian businesses need ISO 9001 certification to win contracts, satisfy clients, or enter new markets. Most hit the same four walls.</div>
+    <div class="pain-grid">
+      <div class="pain-card"><div class="pain-icon">💸</div><h4>Consultants cost $15,000–$25,000</h4><p>For most small businesses, that's not a line item — it's a decision not to bother.</p></div>
+      <div class="pain-card"><div class="pain-icon">📄</div><h4>The standard is impenetrable</h4><p>"Documented information shall be maintained." What does that actually mean for your business?</p></div>
+      <div class="pain-card"><div class="pain-icon">⏳</div><h4>It takes months</h4><p>A typical consultant engagement runs three to six months of back-and-forth. You need it done.</p></div>
+      <div class="pain-card"><div class="pain-icon">📋</div><h4>Templates don't help</h4><p>Generic document templates still require you to write the content. That's the hard part.</p></div>
+    </div>
+  </div>
 </div>
+<div class="section">
+  <div class="section-inner">
+    <div class="section-tag">How Trixie works</div>
+    <div class="section-headline">A conversation. Then a document pack.</div>
+    <div class="section-sub">Trixie works like a knowledgeable consultant who already knows ISO 9001 inside out — and charges $797 instead of $25,000.</div>
+    <div class="steps">
+      <div class="step"><div class="step-num">1</div><div><h3>Tell Trixie about your organisation</h3><p>Name, what you do, how many people, what industry. Two minutes. Everything specific to your business.</p></div></div>
+      <div class="step"><div class="step-num">2</div><div><h3>Trixie guides you clause by clause</h3><p>Starting at Clause 4 through to Clause 10, Trixie asks focused questions in plain English. You answer in your own words.</p></div></div>
+      <div class="step"><div class="step-num">3</div><div><h3>Documents generate as you go</h3><p>As each conversation completes, Trixie generates the relevant document — a proper Word file, ready to download immediately.</p></div></div>
+      <div class="step"><div class="step-num">4</div><div><h3>Download your complete pack</h3><p>When all 11 documents are done, download the complete ISO 9001:2015 pack as a single zip file. Ready for audit.</p></div></div>
+    </div>
+  </div>
 </div>
-<script>
-const STORAGE_KEY='trixie_v4';
-const TRUSTPILOT_URL='https://www.trustpilot.com/review/gettrixie.com';
-const CLAUSES=[
-  {id:'c4',label:'Clause 4',sub:'Context',artefacts:['QMS scope statement','Context & interested parties analysis']},
-  {id:'c5',label:'Clause 5',sub:'Leadership',artefacts:['Quality policy','Roles & authorities register']},
-  {id:'c6',label:'Clause 6',sub:'Planning',artefacts:['Risk & opportunities register','Quality objectives register']},
-  {id:'c7',label:'Clause 7',sub:'Support',artefacts:['Competence & training framework','Documented information register']},
-  {id:'c8',label:'Clause 8',sub:'Operation',artefacts:['Process controls summary']},
-  {id:'c9',label:'Clause 9',sub:'Performance evaluation',artefacts:['Internal audit programme']},
-  {id:'c10',label:'Clause 10',sub:'Improvement',artefacts:['Nonconformity & corrective action log']}
-];
-const ART_CLAUSE={
-  'QMS scope statement':'Cl. 4.3',
-  'Context & interested parties analysis':'Cl. 4.1-4.2',
-  'Quality policy':'Cl. 5.2',
-  'Roles & authorities register':'Cl. 5.3',
-  'Risk & opportunities register':'Cl. 6.1',
-  'Quality objectives register':'Cl. 6.2',
-  'Competence & training framework':'Cl. 7.2',
-  'Documented information register':'Cl. 7.5',
-  'Process controls summary':'Cl. 8.1',
-  'Internal audit programme':'Cl. 9.2',
-  'Nonconformity & corrective action log':'Cl. 10.2'
-};
-const ALL_ARTS=CLAUSES.flatMap(c=>c.artefacts);
-let S={apiKey:'',org:'',desc:'',size:'',industry:'',existingDocs:'none',brandLogo:'',brandColour:'#1D9E75',brandDomain:'',currentClause:0,history:{},artStatus:{},artContent:{},loading:false,tpShown:{},startTime:Date.now()};
-function save(){try{localStorage.setItem(STORAGE_KEY,JSON.stringify({...S,apiKey:'',loading:false}));}catch(e){}}
-function load(){try{const d=JSON.parse(localStorage.getItem(STORAGE_KEY)||'{}');if(d.org){Object.assign(S,d);return true;}}catch(e){}return false;}
-(function init(){
-  if(load()&&S.org){
-    document.getElementById('resumeBanner').style.display='block';
-    document.getElementById('resumeOrg').textContent=S.org;
-    document.getElementById('orgName').value=S.org;
-    document.getElementById('orgDesc').value=S.desc;
-    document.getElementById('orgSize').value=S.size;
-    document.getElementById('orgIndustry').value=S.industry||'';
-    document.getElementById('brandDomain').value=S.brandDomain||'';
-    selectExisting(S.existingDocs||'none');
-    if(S.brandLogo)showBrandPreview(S.brandLogo,S.brandDomain,S.brandColour);
-  }
-})();
-async function fetchBrand(){
-  const domain=document.getElementById('brandDomain').value.trim();
-  if(!domain)return;
-  const btn=document.getElementById('fetchBtn');
-  btn.disabled=true;btn.textContent='Fetching...';
-  let cleanDomain=domain.replace(/^https?:\/\//,'').replace(/\/.*$/,'');
-  try{
-    const faviconUrl=`https://www.google.com/s2/favicons?domain=${cleanDomain}&sz=64`;
-    const proxyUrl=`https://api.allorigins.win/get?url=${encodeURIComponent('https://'+cleanDomain)}`;
-    const res=await fetch(proxyUrl,{signal:AbortSignal.timeout(6000)});
-    const data=await res.json();
-    let orgName=cleanDomain,colour='#1D9E75';
-    if(data.contents){
-      const titleMatch=data.contents.match(/<title[^>]*>([^<]+)<\/title>/i);
-      if(titleMatch)orgName=titleMatch[1].trim().split('|')[0].trim().split('-')[0].trim();
-      const themeMatch=data.contents.match(/name=["']theme-color["'][^>]*content=["']([^"']+)["']/i)||data.contents.match(/content=["']([^"']+)["'][^>]*name=["']theme-color["']/i);
-      if(themeMatch&&themeMatch[1].startsWith('#'))colour=themeMatch[1];
-    }
-    S.brandLogo=faviconUrl;S.brandColour=colour;S.brandDomain=cleanDomain;
-    showBrandPreview(faviconUrl,orgName||cleanDomain,colour);
-    if(!document.getElementById('orgName').value)document.getElementById('orgName').value=orgName;
-  }catch(e){
-    S.brandLogo=`https://www.google.com/s2/favicons?domain=${cleanDomain}&sz=64`;
-    S.brandDomain=cleanDomain;
-    document.getElementById('colourFallback').style.display='flex';
-    showBrandPreview(S.brandLogo,cleanDomain,S.brandColour);
-  }
-  btn.disabled=false;btn.textContent='Fetch';
-}
-function showBrandPreview(logoUrl,name,colour){
-  const preview=document.getElementById('brandPreview');
-  document.getElementById('brandLogo').src=logoUrl;
-  document.getElementById('brandName').textContent=name;
-  document.getElementById('brandUrl').textContent=S.brandDomain;
-  preview.style.display='flex';
-}
-function clearBrand(){
-  S.brandLogo='';S.brandDomain='';S.brandColour='#1D9E75';
-  document.getElementById('brandPreview').style.display='none';
-  document.getElementById('brandDomain').value='';
-  document.getElementById('colourFallback').style.display='none';
-}
-document.getElementById('brandColour').addEventListener('change',function(){S.brandColour=this.value;});
-function selectExisting(val){
-  S.existingDocs=val;
-  ['none','some','all'].forEach(v=>{document.getElementById('opt-'+v).classList.toggle('selected',v===val);});
-}
-function handleStart(){
-  const key=document.getElementById('apiKey').value.trim();
-  const org=document.getElementById('orgName').value.trim();
-  const desc=document.getElementById('orgDesc').value.trim();
-  const size=document.getElementById('orgSize').value.trim();
-  const industry=document.getElementById('orgIndustry').value.trim();
-  const err=document.getElementById('setupErr');
-  err.textContent='';
-  if(!key){err.textContent='Please enter your Anthropic API key.';return;}
-  if(!key.startsWith('sk-')){err.textContent='API key should start with sk-';return;}
-  if(!org||!desc||!size||!industry){err.textContent='Please fill in all organisation fields.';return;}
-  S.apiKey=key;
-  if(!S.org){
-    S.org=org;S.desc=desc;S.size=size;S.industry=industry;
-    S.existingDocs=S.existingDocs||'none';
-    S.history={};S.artStatus={};S.artContent={};S.tpShown={};
-    S.startTime=Date.now();
-    CLAUSES.forEach(c=>{S.history[c.id]=[];});
-  }
-  if(document.getElementById('colourFallback').style.display!=='none'){
-    S.brandColour=document.getElementById('brandColour').value;
-  }
-  save();showMain();
-}
-function showMain(){
-  document.getElementById('setupScreen').classList.remove('active');
-  document.getElementById('mainScreen').classList.add('active');
-  document.getElementById('sbOrg').textContent=S.org;
-  if(S.brandLogo){
-    document.getElementById('sbBrand').style.display='flex';
-    document.getElementById('sbLogo').src=S.brandLogo;
-    document.getElementById('sbColour').style.background=S.brandColour;
-  }
-  renderSidebar();renderArtefacts();openClause(S.currentClause||0);
-}
-function renderSidebar(){
-  const list=document.getElementById('clList');
-  if(!list)return;
-  list.innerHTML=CLAUSES.map((c,i)=>{
-    const done=c.artefacts.filter(a=>S.artStatus[a]==='done').length;
-    const cls=i===S.currentClause?'active':done===c.artefacts.length?'completed':'';
-    return `<div class="cl-item ${cls}" onclick="openClause(${i})"><div class="cl-dot"></div><div class="cl-name">${c.label}<span class="cl-sub">${c.sub}</span></div><div class="cl-ct">${done}/${c.artefacts.length}</div></div>`;
-  }).join('');
-  const done=ALL_ARTS.filter(a=>S.artStatus[a]==='done').length;
-  const pct=Math.round(done/ALL_ARTS.length*100);
-  document.getElementById('progFill').style.width=pct+'%';
-  document.getElementById('progTxt').textContent=`${done} of ${ALL_ARTS.length} documents complete`;
-  const dlAll=document.getElementById('dlAll');
-  if(dlAll)dlAll.style.display=done===ALL_ARTS.length?'block':'none';
-}
-function renderArtefacts(){
-  const list=document.getElementById('artList');
-  if(!list)return;
-  list.innerHTML=CLAUSES.map(c=>c.artefacts.map(a=>{
-    const st=S.artStatus[a]||'todo';
-    const stLabel=st==='done'?'Complete':st==='progress'?'In progress':'Not started';
-    const dl=st==='done'?`<div class="dl-btn" onclick="downloadArt('${a}')">Download .docx</div>`:'';
-    return `<div class="art-card ${st==='done'?'done':''}"><div class="art-name">${a}</div><div class="art-clause">${ART_CLAUSE[a]||''}</div><div class="art-st ${st}">${stLabel}</div>${dl}</div>`;
-  }).join('')).join('');
-}
-function openClause(idx){
-  S.currentClause=idx;save();
-  const c=CLAUSES[idx];
-  document.getElementById('tbTitle').textContent=`${c.label} - ${c.sub}`;
-  document.getElementById('tbSub').textContent=c.artefacts.join(' - ');
-  const allDone=c.artefacts.every(a=>S.artStatus[a]==='done');
-  const badge=document.getElementById('tbBadge');
-  badge.textContent=allDone?'Complete':'In progress';
-  badge.className='tb-badge '+(allDone?'done':'progress');
-  renderSidebar();renderMsgs();
-  if(!S.history[c.id]||S.history[c.id].length===0){
-    if(!S.history[c.id])S.history[c.id]=[];
-    S.history[c.id].push({role:'assistant',content:greeting(c.id)});
-    save();renderMsgs();
-  }
-}
-function renderMsgs(){
-  const c=CLAUSES[S.currentClause];
-  const msgs=document.getElementById('msgs');
-  if(!msgs)return;
-  msgs.innerHTML=(S.history[c.id]||[]).map(m=>{
-    if(m.thinking)return `<div class="msg-wrap trixie"><div class="msg-sender">Trixie</div><div class="bubble thinking">Thinking...</div></div>`;
-    const cls=m.role==='assistant'?'trixie':'user';
-    const bubbleCls=m.milestone?'milestone':m.awareness?'awareness':(m.role==='assistant'?'trixie':'user');
-    const chip=m.artGenerated?`<div class="art-chip" onclick="downloadArt('${m.artGenerated}')">Download ${m.artGenerated}</div>`:'';
-    const tpNudge=m.showTrustpilot?`<div class="tp-nudge"><div class="tp-nudge-stars">★★★★★</div><div class="tp-nudge-title">Before you download...</div><div class="tp-nudge-body">That just saved you months of work and thousands of dollars. If Trixie helped, a quick Trustpilot review would mean the world to us — and help other businesses find us.</div><div class="tp-nudge-btns"><a class="tp-review-btn" href="${TRUSTPILOT_URL}" target="_blank">Leave a review</a><button class="tp-skip-btn" onclick="this.closest('.tp-nudge').style.display='none'">Maybe later</button></div></div>`:'';
-    return `<div class="msg-wrap ${cls}"><div class="msg-sender">${m.role==='assistant'?'Trixie':'You'}</div><div class="bubble ${bubbleCls}">${fmt(m.content)}</div>${chip}${tpNudge}</div>`;
-  }).join('');
-  msgs.scrollTop=msgs.scrollHeight;
-}
-function fmt(t){return(t||'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/\n/g,'<br>').replace(/\*\*(.*?)\*\*/g,'<strong>$1</strong>');}
-function greeting(clauseId){
-  const org=S.org;
-  const existing=S.existingDocs;
-  const ec=existing==='some'?" I know you've got some documentation already — we'll build on what you have rather than starting from scratch.":existing==='all'?" Since you've got most of your documentation sorted, we'll focus on finding any gaps rather than rebuilding everything.":'';
-  const g={
-    c4:`G'day! I'm Trixie — and I am genuinely delighted you're here.\n\nGetting ISO 9001 certified is one of the best things you can do for ${org}, and I'm going to make it as painless as possible. Promise.\n\nWe'll work through Clauses 4 to 10 together, and by the time we're done you'll have a complete, professional document pack ready to hand to any certifying body.${ec}\n\nLet's kick things off with **Clause 4 — Context**. This is where we establish what your QMS actually covers and why.\n\nFirst question: what products or services does ${org} deliver to customers? And is there anything you'd want to keep outside the scope of your QMS?`,
-    c5:`Clause 4 done! That's the foundation of your entire QMS sorted. Honestly, that's the most conceptually tricky bit and you've nailed it.\n\nNow onto **Clause 5 — Leadership**. Auditors want to see that the people at the top of ${org} are genuinely committed to quality — in writing, signed, and understood by the whole team.\n\nWe need two things: a **Quality Policy** and a **Roles and Authorities Register**.\n\nFirst: who is the most senior person at ${org} — what's their title? And in one sentence — what is your organisation's core promise to its customers?`,
-    c6:`Two clauses down — you're making excellent progress!\n\n**Clause 6 — Planning** is where we get practical about risk. We need a **Risk and Opportunities Register** and a **Quality Objectives Register**.\n\nTo get started — what are the two or three biggest things that could threaten ${org}'s ability to deliver quality work consistently? Think: losing key people, supply chain issues, client changes, regulations... whatever genuinely keeps you up at night.`,
-    c7:`Halfway! You are absolutely smashing this.\n\n**Clause 7 — Support** is about making sure you have the right people, the right skills, and the right documentation infrastructure.\n\nWe need a **Competence and Training Framework** and a **Documented Information Register**.\n\nLet's start with competence. What are the key roles at ${org} that directly affect the quality of what you deliver? Give me 3 to 5 role titles and I'll build the framework for each.`,
-    c8:`More than halfway there and you're flying!\n\n**Clause 8 — Operation** is the engine room — how ${org} actually controls its delivery day to day.\n\nWe need a **Process Controls Summary** mapping your key delivery processes, inputs, outputs, and controls.\n\nWalk me through your typical delivery lifecycle. How does a piece of work begin? And what does successfully delivered look like at the other end?`,
-    c9:`Two clauses left — the finish line is in sight!\n\n**Clause 9 — Performance Evaluation**. The main document is an **Internal Audit Programme** — a rolling 12-month schedule of planned audits across all QMS clauses.\n\nWho at ${org} could conduct internal audits? They need to be independent — not auditing their own work. Do you have someone with quality experience, or would you use an external auditor?`,
-    c10:`Last one! I can practically hear the champagne being opened.\n\n**Clause 10 — Improvement**. We need a **Nonconformity and Corrective Action Log** — a ready-to-use template your team fills in whenever an issue arises.\n\nOne quick question: does ${org} have any existing process for logging incidents or issues — even something informal — that I should align this with?`
-  };
-  return g[clauseId]||g.c4;
-}
-function sysPrompt(clauseId){
-  const existing=S.existingDocs;
-  const ei=existing==='some'?'IMPORTANT: This organisation has some existing documentation. Ask what they have before generating. Incorporate existing documents rather than replacing them.':existing==='all'?'IMPORTANT: This organisation has most documentation. Focus on identifying gaps. Only generate what is missing or incomplete.':'This organisation is starting from scratch. Build all documents fresh.';
-  const ctx=`Organisation: "${S.org}". What they do: ${S.desc}. Size: ~${S.size} employees. Industry: ${S.industry}. ${ei}`;
-  const persona=`You are Trixie, a warm, expert, and genuinely encouraging ISO 9001:2015 certification guide with a light Australian sense of humour. You care deeply about helping this organisation succeed. ${ctx}
-
-PERSONALITY: Be warm, encouraging, and human. Celebrate milestones. Remember details from earlier and reference them. Use light humour. Address the user directly.
-
-GENERAL QUESTIONS: If the user asks a general ISO 9001 question, answer it fully and warmly, then say something like "Right, back to where we were..." and continue. Never lose your place.
-
-STAFF AWARENESS FLAGS: At the end of each clause after producing all documents, add a section starting with the words "Before your audit:" listing implementation actions the organisation needs beyond documentation. Keep it practical and specific.
-
-DOCUMENT GENERATION: When ready to produce an artefact, wrap the complete document between:
-<<<ARTEFACT_START:[exact artefact name]>>>
-[complete document content]
-<<<ARTEFACT_END>>>
-Documents must be complete, professional, and audit-ready. Ask maximum two questions at a time.`;
-
-  const guides={
-    c4:`${persona}\n\nCLAUSE 4: Produce "QMS scope statement" then "Context & interested parties analysis". Scope: org overview, boundaries, products/services, locations, exclusions with justification. Context: Part A internal/external issues table, Part B interested parties table.`,
-    c5:`${persona}\n\nCLAUSE 5: Produce "Quality policy" then "Roles & authorities register". Policy: commitment to requirements and improvement, signature block, 1 page. Roles: table with Role, QMS responsibilities, Authorities, Reports to columns.`,
-    c6:`${persona}\n\nCLAUSE 6: Produce "Risk & opportunities register" then "Quality objectives register". Risk register: table with Ref, Description, Type, Likelihood 1-3, Impact 1-3, Rating, Action, Owner, Review date. Minimum 8 entries. Objectives: table with Objective, Policy link, KPI, Target, Data source, Frequency, Owner, Review date. Minimum 4 objectives.`,
-    c7:`${persona}\n\nCLAUSE 7: Produce "Competence & training framework" then "Documented information register". Competence: per role with qualifications, experience, training, assessment method, evidence, reassessment frequency. Register: table with Document title, Type, Clause, Owner, Version, Review frequency, Storage, Access.`,
-    c8:`${persona}\n\nCLAUSE 8: Produce "Process controls summary". Per key process: name, inputs, outputs, owner, controls, monitoring, acceptance criteria, documents, linked risks. Minimum 4 processes.`,
-    c9:`${persona}\n\nCLAUSE 9: Produce "Internal audit programme". Include purpose, independence requirement, 12-month schedule table with Audit ref, Clauses, Month, Method, Auditor, Criteria, Report to. Cover all clauses 4-10. Include findings and corrective action process.`,
-    c10:`${persona}\n\nCLAUSE 10: Produce "Nonconformity & corrective action log". Include field reference table and 3 realistic example entries for this specific industry. Fields: NC ref, date, raised by, source, description, containment, root cause, corrective action, owner, target date, effectiveness review, close date, sign-off.`
-  };
-  return guides[clauseId]||guides.c4;
-}
-async function sendMsg(){
-  if(S.loading)return;
-  const input=document.getElementById('userInput');
-  const text=input.value.trim();
-  if(!text)return;
-  input.value='';
-  const c=CLAUSES[S.currentClause];
-  if(!S.history[c.id])S.history[c.id]=[];
-  S.history[c.id].push({role:'user',content:text});
-  c.artefacts.forEach(a=>{if(!S.artStatus[a])S.artStatus[a]='progress';});
-  S.history[c.id].push({role:'assistant',thinking:true,content:''});
-  S.loading=true;
-  document.getElementById('sendBtn').disabled=true;
-  renderMsgs();renderArtefacts();
-  try{
-    const apiMsgs=S.history[c.id].filter(m=>!m.thinking).map(m=>({role:m.role,content:m.content}));
-    const res=await fetch('https://api.anthropic.com/v1/messages',{
-      method:'POST',
-      headers:{'Content-Type':'application/json','x-api-key':S.apiKey,'anthropic-version':'2023-06-01','anthropic-dangerous-direct-browser-access':'true'},
-      body:JSON.stringify({model:'claude-sonnet-4-20250514',max_tokens:2500,system:sysPrompt(c.id),messages:apiMsgs})
-    });
-    const data=await res.json();
-    if(data.error)throw new Error(data.error.message);
-    const raw=data.content?.[0]?.text||'Sorry, I had trouble responding. Please try again.';
-    const arts=extractArts(raw);
-    const clean=stripMarkers(raw);
-    arts.forEach(art=>{
-      const matched=ALL_ARTS.find(a=>a.toLowerCase()===art.name.toLowerCase());
-      if(matched){S.artStatus[matched]='done';S.artContent[matched]=art.content;}
-    });
-    S.history[c.id]=S.history[c.id].filter(m=>!m.thinking);
-    const msgObj={role:'assistant',content:clean};
-    if(arts.length>0){
-      const matched=ALL_ARTS.find(a=>a.toLowerCase()===arts[0].name.toLowerCase());
-      if(matched){
-        msgObj.artGenerated=matched;
-        if(S.currentClause>0&&!S.tpShown[c.id]){S.tpShown[c.id]=true;msgObj.showTrustpilot=true;}
-      }
-    }
-    if(clean.includes('Before your audit')||clean.includes('before your audit'))msgObj.awareness=true;
-    const mw=['well done','nailed it','smashing','halfway','finish line','champagne','flying','excellent progress','delighted'];
-    if(mw.some(w=>clean.toLowerCase().includes(w)))msgObj.milestone=true;
-    S.history[c.id].push(msgObj);
-    const allDone=c.artefacts.every(a=>S.artStatus[a]==='done');
-    if(allDone){const badge=document.getElementById('tbBadge');if(badge){badge.textContent='Complete';badge.className='tb-badge done';}}
-    save();
-  }catch(e){
-    S.history[c.id]=S.history[c.id].filter(m=>!m.thinking);
-    S.history[c.id].push({role:'assistant',content:`Oops — hit a snag: ${e.message}\n\nDouble-check your API key and give it another go. I'm not going anywhere!`});
-  }
-  S.loading=false;
-  document.getElementById('sendBtn').disabled=false;
-  renderSidebar();renderArtefacts();renderMsgs();
-}
-function extractArts(text){const found=[];const re=/<<<ARTEFACT_START:([^>]+)>>>([\s\S]*?)<<<ARTEFACT_END>>>/g;let m;while((m=re.exec(text))!==null)found.push({name:m[1].trim(),content:m[2].trim()});return found;}
-function stripMarkers(text){return text.replace(/<<<ARTEFACT_START:[^>]+>>>[\s\S]*?<<<ARTEFACT_END>>>/g,'[Document generated - see panel to download]').trim();}
-const DARK_HEX='1A1A1A',GRAY_HEX='5F5E5A',LITE_HEX='F5F5F5',WHITE_HEX='FFFFFF';
-function getAccentHex(){return(S.brandColour||'#1D9E75').replace('#','');}
-function getDocx(){return window.docx;}
-function makeBorders(){const b={style:'single',size:1,color:'DDDDDD'};return{top:b,bottom:b,left:b,right:b};}
-function hdrRow(cells,widths){const{TableRow,TableCell,Paragraph,TextRun,ShadingType,WidthType}=getDocx();const accent=getAccentHex();return new TableRow({tableHeader:true,children:cells.map((c,i)=>new TableCell({borders:makeBorders(),width:{size:widths[i],type:WidthType.DXA},shading:{fill:accent,type:ShadingType.CLEAR},margins:{top:80,bottom:80,left:120,right:120},children:[new Paragraph({children:[new TextRun({text:String(c),bold:true,color:WHITE_HEX,size:20,font:'Arial'})]})]}))})}
-function dataRow(cells,widths,shade){const{TableRow,TableCell,Paragraph,TextRun,ShadingType,WidthType}=getDocx();return new TableRow({children:cells.map((c,i)=>new TableCell({borders:makeBorders(),width:{size:widths[i],type:WidthType.DXA},shading:{fill:shade||WHITE_HEX,type:ShadingType.CLEAR},margins:{top:80,bottom:80,left:120,right:120},children:[new Paragraph({children:[new TextRun({text:String(c||''),size:20,font:'Arial',color:DARK_HEX})]})]}))})}
-function H1(text){const{Paragraph,TextRun,HeadingLevel,BorderStyle}=getDocx();return new Paragraph({heading:HeadingLevel.HEADING_1,spacing:{before:360,after:180},border:{bottom:{style:BorderStyle.SINGLE,size:4,color:getAccentHex(),space:4}},children:[new TextRun({text,bold:true,size:30,font:'Arial',color:DARK_HEX})]});}
-function H2(text){const{Paragraph,TextRun,HeadingLevel}=getDocx();return new Paragraph({heading:HeadingLevel.HEADING_2,spacing:{before:260,after:120},children:[new TextRun({text,bold:true,size:24,font:'Arial',color:getAccentHex()})]});}
-function Body(text){const{Paragraph,TextRun}=getDocx();return new Paragraph({spacing:{before:60,after:120},children:[new TextRun({text:String(text),size:22,font:'Arial',color:DARK_HEX})]});}
-function Meta(label,value){const{Paragraph,TextRun}=getDocx();return new Paragraph({spacing:{before:40,after:40},children:[new TextRun({text:label+': ',bold:true,size:20,font:'Arial',color:GRAY_HEX}),new TextRun({text:String(value),size:20,font:'Arial',color:DARK_HEX})]});}
-function Spacer(){const{Paragraph,TextRun}=getDocx();return new Paragraph({children:[new TextRun('')],spacing:{before:100,after:0}});}
-function PB(){const{Paragraph,TextRun}=getDocx();return new Paragraph({pageBreakBefore:true,children:[new TextRun('')]});}
-function Footnote(){const{Paragraph,TextRun,BorderStyle}=getDocx();return new Paragraph({spacing:{before:480,after:0},border:{top:{style:BorderStyle.SINGLE,size:2,color:getAccentHex(),space:4}},children:[new TextRun({text:'Document control: Maintained per ISO 9001:2015 Clause 7.5. Generated by Trixie - gettrixie.com. Printed copies are uncontrolled.',size:18,font:'Arial',color:GRAY_HEX})]});}
-function Cover(artName,clauseRef){const{Paragraph,TextRun,AlignmentType,BorderStyle}=getDocx();const accent=getAccentHex();const date=new Date().toLocaleDateString('en-AU',{day:'2-digit',month:'long',year:'numeric'});return[new Paragraph({spacing:{before:2000,after:0},children:[new TextRun('')]}),new Paragraph({alignment:AlignmentType.CENTER,spacing:{before:0,after:120},children:[new TextRun({text:'Trixie',size:80,bold:true,font:'Arial',color:accent})]}),new Paragraph({alignment:AlignmentType.CENTER,spacing:{before:0,after:600},children:[new TextRun({text:'ISO 9001:2015 Certification Guide',size:28,font:'Arial',color:GRAY_HEX})]}),new Paragraph({alignment:AlignmentType.CENTER,spacing:{before:0,after:80},children:[new TextRun({text:S.org,size:44,bold:true,font:'Arial',color:DARK_HEX})]}),new Paragraph({alignment:AlignmentType.CENTER,spacing:{before:0,after:80},children:[new TextRun({text:S.industry,size:24,font:'Arial',color:GRAY_HEX})]}),new Paragraph({alignment:AlignmentType.CENTER,spacing:{before:0,after:1200},children:[new TextRun({text:date,size:20,font:'Arial',color:GRAY_HEX})]}),new Paragraph({alignment:AlignmentType.CENTER,spacing:{before:0,after:100},children:[new TextRun({text:artName,size:36,bold:true,font:'Arial',color:DARK_HEX})]}),new Paragraph({alignment:AlignmentType.CENTER,spacing:{before:0,after:200},children:[new TextRun({text:clauseRef,size:22,font:'Arial',color:GRAY_HEX})]}),new Paragraph({alignment:AlignmentType.CENTER,border:{top:{style:BorderStyle.SINGLE,size:2,color:accent,space:4},bottom:{style:BorderStyle.SINGLE,size:2,color:accent,space:4}},spacing:{before:120,after:120},children:[new TextRun({text:'CONFIDENTIAL - ISO 9001:2015 QMS documentation. Generated by Trixie. Printed copies are uncontrolled.',size:18,font:'Arial',color:GRAY_HEX})]})];}
-function makeDocHeader(){const{Header,Paragraph,TextRun,BorderStyle}=getDocx();const accent=getAccentHex();return new Header({children:[new Paragraph({spacing:{before:0,after:100},border:{bottom:{style:BorderStyle.SINGLE,size:4,color:accent,space:4}},children:[new TextRun({text:'Trixie  |  ISO 9001:2015  |  ',size:18,font:'Arial',color:GRAY_HEX}),new TextRun({text:S.org,size:18,font:'Arial',bold:true,color:accent})]})]});}
-function makeDocFooter(){const{Footer,Paragraph,TextRun,SimpleField,BorderStyle}=getDocx();const accent=getAccentHex();return new Footer({children:[new Paragraph({spacing:{before:100,after:0},border:{top:{style:BorderStyle.SINGLE,size:2,color:accent,space:4}},children:[new TextRun({text:'Generated by Trixie - gettrixie.com  |  Confidential  |  Page ',size:18,font:'Arial',color:GRAY_HEX}),new SimpleField('PAGE',{size:18,font:'Arial',color:GRAY_HEX})]})]});}
-function buildDoc(children){const{Document}=getDocx();return new Document({styles:{default:{document:{run:{font:'Arial',size:22,color:DARK_HEX}}},paragraphStyles:[{id:'Heading1',name:'Heading 1',basedOn:'Normal',next:'Normal',quickFormat:true,run:{size:30,bold:true,font:'Arial',color:DARK_HEX},paragraph:{spacing:{before:360,after:180},outlineLevel:0}},{id:'Heading2',name:'Heading 2',basedOn:'Normal',next:'Normal',quickFormat:true,run:{size:24,bold:true,font:'Arial',color:getAccentHex()},paragraph:{spacing:{before:260,after:120},outlineLevel:1}}]},sections:[{properties:{page:{size:{width:11906,height:16838},margin:{top:1440,right:1440,bottom:1440,left:1440}}},headers:{default:makeDocHeader()},footers:{default:makeDocFooter()},children}]});}
-function contentToDocx(artName,rawContent){const{Table,WidthType}=getDocx();const date=new Date().toLocaleDateString('en-AU',{day:'2-digit',month:'long',year:'numeric'});const reviewDate=new Date(Date.now()+365*24*60*60*1000).toLocaleDateString('en-AU',{day:'2-digit',month:'long',year:'numeric'});const children=[...Cover(artName,ART_CLAUSE[artName]||''),PB(),H1(artName),Meta('Document reference',`QMS-${artName.replace(/[^A-Za-z]/g,'').substring(0,4).toUpperCase()}-001`),Meta('Clause',ART_CLAUSE[artName]||''),Meta('Organisation',S.org),Meta('Industry',S.industry),Meta('Issue date',date),Meta('Review date',reviewDate),Meta('Approved by','Managing Director'),Spacer()];
-const lines=rawContent.split('\n');let i=0;
-while(i<lines.length){const line=lines[i];if(line.match(/^#{1}\s+/)){children.push(H1(line.replace(/^#+\s+/,'')));i++;}else if(line.match(/^#{2,}\s+/)){children.push(H2(line.replace(/^#+\s+/,'')));i++;}else if(line.includes('|')&&!line.match(/^[-|: ]+$/)){const tableLines=[];while(i<lines.length&&lines[i].includes('|')){if(!lines[i].match(/^[-|: ]+$/))tableLines.push(lines[i]);i++;}if(tableLines.length>=2){const rows=tableLines.map(l=>l.split('|').map(c=>c.trim()).filter((_,j,a)=>j>0&&j<a.length-1));if(rows[0]&&rows[0].length>0){const w=Math.floor(9026/rows[0].length);const widths=rows[0].map(()=>w);widths[widths.length-1]=9026-w*(rows[0].length-1);children.push(new Table({width:{size:9026,type:WidthType.DXA},columnWidths:widths,rows:[hdrRow(rows[0],widths),...rows.slice(1).map((r,idx)=>dataRow(r,widths,idx%2===0?LITE_HEX:WHITE_HEX))]}));children.push(Spacer());}}}else if(line.trim()&&!line.match(/^Before your audit/i)){children.push(Body(line.trim()));i++;}else{i++;}}
-children.push(Spacer(),Footnote());return buildDoc(children);}
-async function downloadArt(name){const content=S.artContent[name];if(!content){alert('Document not yet generated.');return;}try{const d=contentToDocx(name,content);const{Packer}=getDocx();const buf=await Packer.toBuffer(d);const blob=new Blob([buf],{type:'application/vnd.openxmlformats-officedocument.wordprocessingml.document'});const url=URL.createObjectURL(blob);const a=document.createElement('a');a.href=url;a.download=name.replace(/[^a-z0-9]/gi,'_').toLowerCase()+'.docx';a.click();URL.revokeObjectURL(url);}catch(e){alert('Error generating document: '+e.message);}}
-async function downloadAll(){const done=ALL_ARTS.filter(a=>S.artContent[a]);if(!done.length){alert('No documents generated yet.');return;}const{Packer}=getDocx();const zip=new JSZip();for(const name of done){try{const d=contentToDocx(name,S.artContent[name]);const buf=await Packer.toBuffer(d);zip.file(name.replace(/[^a-z0-9]/gi,'_').toLowerCase()+'.docx',buf);}catch(e){console.error('Skip',name,e);}}const blob=await zip.generateAsync({type:'blob'});const url=URL.createObjectURL(blob);const a=document.createElement('a');a.href=url;a.download=S.org.replace(/[^a-z0-9]/gi,'_').toLowerCase()+'_iso9001_pack.zip';a.click();URL.revokeObjectURL(url);}
-function resetSession(){if(!confirm('This will clear all your progress and start fresh. Are you sure?'))return;localStorage.removeItem(STORAGE_KEY);location.reload();}
-</script>
+<div class="section artefacts">
+  <div class="section-inner">
+    <div class="section-tag">What you get</div>
+    <div class="section-headline">11 audit-ready documents. Zero blank pages.</div>
+    <div class="section-sub">Every document an ISO 9001 auditor will look for — generated with your organisation's specific processes, risks, and structure.</div>
+    <div class="art-grid">
+      <div class="art-item"><div class="art-tick"><svg viewBox="0 0 12 12"><polyline points="2,6 5,9 10,3"/></svg></div><div><div class="art-item-name">QMS scope statement</div><div class="art-item-clause">Clause 4.3</div></div></div>
+      <div class="art-item"><div class="art-tick"><svg viewBox="0 0 12 12"><polyline points="2,6 5,9 10,3"/></svg></div><div><div class="art-item-name">Context & interested parties analysis</div><div class="art-item-clause">Clause 4.1–4.2</div></div></div>
+      <div class="art-item"><div class="art-tick"><svg viewBox="0 0 12 12"><polyline points="2,6 5,9 10,3"/></svg></div><div><div class="art-item-name">Quality policy</div><div class="art-item-clause">Clause 5.2</div></div></div>
+      <div class="art-item"><div class="art-tick"><svg viewBox="0 0 12 12"><polyline points="2,6 5,9 10,3"/></svg></div><div><div class="art-item-name">Roles & authorities register</div><div class="art-item-clause">Clause 5.3</div></div></div>
+      <div class="art-item"><div class="art-tick"><svg viewBox="0 0 12 12"><polyline points="2,6 5,9 10,3"/></svg></div><div><div class="art-item-name">Risk & opportunities register</div><div class="art-item-clause">Clause 6.1</div></div></div>
+      <div class="art-item"><div class="art-tick"><svg viewBox="0 0 12 12"><polyline points="2,6 5,9 10,3"/></svg></div><div><div class="art-item-name">Quality objectives register</div><div class="art-item-clause">Clause 6.2</div></div></div>
+      <div class="art-item"><div class="art-tick"><svg viewBox="0 0 12 12"><polyline points="2,6 5,9 10,3"/></svg></div><div><div class="art-item-name">Competence & training framework</div><div class="art-item-clause">Clause 7.2</div></div></div>
+      <div class="art-item"><div class="art-tick"><svg viewBox="0 0 12 12"><polyline points="2,6 5,9 10,3"/></svg></div><div><div class="art-item-name">Documented information register</div><div class="art-item-clause">Clause 7.5</div></div></div>
+      <div class="art-item"><div class="art-tick"><svg viewBox="0 0 12 12"><polyline points="2,6 5,9 10,3"/></svg></div><div><div class="art-item-name">Process controls summary</div><div class="art-item-clause">Clause 8.1</div></div></div>
+      <div class="art-item"><div class="art-tick"><svg viewBox="0 0 12 12"><polyline points="2,6 5,9 10,3"/></svg></div><div><div class="art-item-name">Internal audit programme</div><div class="art-item-clause">Clause 9.2</div></div></div>
+      <div class="art-item"><div class="art-tick"><svg viewBox="0 0 12 12"><polyline points="2,6 5,9 10,3"/></svg></div><div><div class="art-item-name">Nonconformity & corrective action log</div><div class="art-item-clause">Clause 10.2</div></div></div>
+      <div class="art-item art-zip"><div class="art-tick" style="background:rgba(255,255,255,0.25)"><svg viewBox="0 0 12 12"><polyline points="2,6 5,9 10,3"/></svg></div><div><div class="art-item-name">Complete pack as .zip</div><div class="art-item-clause">All 11 documents, one download</div></div></div>
+    </div>
+    <div class="art-note">Every document is a properly formatted Word file (.docx) with your organisation's name, cover page, running headers, and document control footer.</div>
+  </div>
+</div>
+<div class="section">
+  <div class="section-inner">
+    <div class="section-tag">The comparison</div>
+    <div class="section-headline">Trixie vs. the alternative</div>
+    <table class="compare-table">
+      <thead><tr><th></th><th class="col-consultant">ISO Consultant</th><th class="col-trixie">Trixie</th></tr></thead>
+      <tbody>
+        <tr><td>Cost</td><td class="consultant">$15,000 – $25,000</td><td class="trixie">$797 AUD — one-time</td></tr>
+        <tr><td>Time to complete</td><td class="consultant">3 – 6 months</td><td class="trixie">1 – 3 days</td></tr>
+        <tr><td>Tailored to your org</td><td class="consultant">Yes</td><td class="trixie">Yes</td></tr>
+        <tr><td>Available 24/7</td><td class="consultant">No</td><td class="trixie">Yes</td></tr>
+        <tr><td>Plain-English guidance</td><td class="consultant">Sometimes</td><td class="trixie">Every step</td></tr>
+        <tr><td>Your data stays private</td><td class="consultant">No — consultant sees all</td><td class="trixie">Yes — stays in your browser</td></tr>
+        <tr><td>Documents you own</td><td class="consultant">Sometimes</td><td class="trixie">Always — Word format</td></tr>
+      </tbody>
+    </table>
+  </div>
+</div>
+<div class="quote-section">
+  <div class="quote-inner">
+    <div class="quote-text">"ISO 9001 certification used to mean months of meetings and a bill that made your eyes water. Trixie makes it <em>a week's work.</em>"</div>
+    <div class="quote-body">Trixie guides you through the standard the way a good consultant would — but she's available at midnight when you're trying to finish the risk register, and she doesn't charge by the hour.</div>
+  </div>
+</div>
+<div class="section who">
+  <div class="section-inner">
+    <div class="section-tag">Who Trixie is for</div>
+    <div class="section-headline">Any organisation. Any size. Any industry.</div>
+    <div class="who-grid">
+      <div class="who-card"><div class="who-tag">Procurement</div><h3>Businesses chasing government or defence contracts</h3><p>ISO 9001 is a baseline requirement. Trixie gets you there without eating your project margin.</p></div>
+      <div class="who-card"><div class="who-tag">Growth</div><h3>SMBs expanding into new markets</h3><p>Major clients expect certification. Trixie makes it achievable without a dedicated quality manager.</p></div>
+      <div class="who-card"><div class="who-tag">Renewal</div><h3>Certified organisations approaching re-audit</h3><p>Surveillance audits require current documentation. Trixie keeps your pack up to date.</p></div>
+      <div class="who-card"><div class="who-tag">Construction</div><h3>Builders & trade contractors</h3><p>Tier 1 contractors and government projects increasingly mandate ISO 9001 from their supply chain.</p></div>
+      <div class="who-card"><div class="who-tag">Engineering</div><h3>Consultants & professional services</h3><p>Technical firms where quality of output is the product. Certification signals that before a word is spoken.</p></div>
+      <div class="who-card"><div class="who-tag">Any sector</div><h3>Anywhere quality matters</h3><p>ISO 9001 is industry-agnostic. If your clients care about consistent delivery — this is for you.</p></div>
+    </div>
+  </div>
+</div>
+<div class="cta-section">
+  <div class="cta-inner">
+    <div class="cta-headline">Ready to get certified?</div>
+    <div class="cta-sub">Start today. Complete your document pack at your own pace — save progress, pick it back up anytime.</div>
+    <div class="cta-price-row">
+      <div class="cta-amount">$797</div>
+      <div class="cta-details"><p><strong>AUD — one-time payment.</strong> No subscription.</p><p>Complete 11-document pack included.</p><p>Powered by your own Anthropic API key.</p></div>
+    </div>
+    <a class="btn-cta" href="https://buy.stripe.com/test_fZudR9dlicvNdj57jygbm00">Get started now</a>
+    <div class="cta-trust">Secure payment via Stripe &nbsp;·&nbsp; Instant access after payment &nbsp;·&nbsp; gettrixie.com</div>
+  </div>
+</div>
+<footer>
+  <div class="footer-logo">Trixie</div>
+  <div class="footer-links">
+    <a href="/app.html">Already purchased? Open Trixie</a>
+    <a href="https://www.trustpilot.com/review/gettrixie.com" target="_blank">Reviews</a>
+  </div>
+  <div class="footer-copy">2026 Sayres Australia Pty Ltd</div>
+</footer>
 </body>
 </html>
