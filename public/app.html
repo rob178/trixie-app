@@ -289,22 +289,15 @@ async function handleBrandGuideUpload(event){
   const processing=document.getElementById('brandUploadProcessing');
   const statusEl=document.getElementById('brandUploadStatus');
   const apiKey=document.getElementById('apiKey').value.trim();
-  processing.style.display='flex';
-  statusEl.textContent='Reading your brand guide...';
+  processing.style.display='flex';statusEl.textContent='Reading your brand guide...';
   const ext=file.name.split('.').pop().toLowerCase();
   try{
     let textContent='';let base64Data='';let isPdf=false;
     if(ext==='docx'){const arrayBuffer=await file.arrayBuffer();const result=await mammoth.extractRawText({arrayBuffer});textContent=result.value;}
     else if(ext==='pdf'){base64Data=await fileToBase64(file);isPdf=true;}
     else{throw new Error('Please upload a PDF or DOCX file.');}
-    S.brandGuideName=file.name;
-    S.brandGuideText=textContent.substring(0,6000);
-    if(!apiKey){
-      processing.style.display='none';
-      showBrandPreviewFromGuide(file.name,'#1D9E75');
-      document.getElementById('colourFallback').style.display='flex';
-      return;
-    }
+    S.brandGuideName=file.name;S.brandGuideText=textContent.substring(0,6000);
+    if(!apiKey){processing.style.display='none';showBrandPreviewFromGuide(file.name,'#1D9E75');document.getElementById('colourFallback').style.display='flex';return;}
     statusEl.textContent='Extracting brand colour...';
     const sysPr='You are a brand analyst. Read the following brand style guide and extract the primary brand colour as a hex code. Return ONLY valid JSON with no other text: {"hex":"#XXXXXX","orgName":"Company Name if found"}. If you cannot find a hex colour, return {"hex":null,"orgName":null}.';
     let userContent;
@@ -319,34 +312,22 @@ async function handleBrandGuideUpload(event){
     const orgName=parsed.orgName||'';
     S.brandColour=hex;S.brandLogo='';S.brandDomain='';
     if(orgName&&!document.getElementById('orgName').value)document.getElementById('orgName').value=orgName;
-    processing.style.display='none';
-    showBrandPreviewFromGuide(file.name,hex);
-    document.getElementById('colourFallback').style.display='none';
-  }catch(e){
-    processing.style.display='none';
-    showBrandPreviewFromGuide(file.name,'#1D9E75');
-    document.getElementById('colourFallback').style.display='flex';
-  }
+    processing.style.display='none';showBrandPreviewFromGuide(file.name,hex);document.getElementById('colourFallback').style.display='none';
+  }catch(e){processing.style.display='none';showBrandPreviewFromGuide(file.name,'#1D9E75');document.getElementById('colourFallback').style.display='flex';}
   event.target.value='';
 }
-function showBrandPreviewFromGuide(fileName,hex){
-  document.getElementById('brandName').textContent=fileName;
-  document.getElementById('brandUrl').innerHTML='<span class="colour-swatch" style="background:'+hex+'"></span>Brand colour: '+hex;
-  document.getElementById('brandPreview').style.display='flex';
-  S.brandColour=hex;
-}
+function showBrandPreviewFromGuide(fileName,hex){document.getElementById('brandName').textContent=fileName;document.getElementById('brandUrl').innerHTML='<span class="colour-swatch" style="background:'+hex+'"></span>Brand colour: '+hex;document.getElementById('brandPreview').style.display='flex';S.brandColour=hex;}
 async function handleFileSelect(event){
   const file=event.target.files[0];if(!file)return;
   const btn=document.getElementById('attachBtn');
-  const preview=document.getElementById('attachPreview');
   btn.disabled=true;
   document.getElementById('attachName').textContent='Processing...';
   document.getElementById('attachSize').textContent='';
-  preview.classList.add('visible');
+  document.getElementById('attachPreview').classList.add('visible');
   const sizeMB=(file.size/1024/1024).toFixed(1);
   const ext=file.name.split('.').pop().toLowerCase();
   try{
-    if(ext==='pdf'){const base64=await fileToBase64(file);pendingAttachment={name:file.name,type:'pdf',size:sizeMB+'MB',mediaType:'application/pdf',data:base64};document.getElementById('attachIcon').textContent='PDF';}
+    if(ext==='pdf'){const base64=await fileToBase64(file);pendingAttachment={name:file.name,type:'pdf',size:sizeMB+'MB',data:base64};document.getElementById('attachIcon').textContent='PDF';}
     else if(ext==='docx'){const arrayBuffer=await file.arrayBuffer();const result=await mammoth.extractRawText({arrayBuffer});pendingAttachment={name:file.name,type:'docx',size:sizeMB+'MB',text:result.value};document.getElementById('attachIcon').textContent='DOC';}
     else if(ext==='txt'){const text=await file.text();pendingAttachment={name:file.name,type:'docx',size:sizeMB+'MB',text};document.getElementById('attachIcon').textContent='TXT';}
     else{throw new Error('Please attach a PDF, DOCX, or TXT file.');}
@@ -359,7 +340,7 @@ async function handleFileSelect(event){
 }
 function fileToBase64(file){return new Promise((resolve,reject)=>{const reader=new FileReader();reader.onload=()=>{resolve(reader.result.split(',')[1]);};reader.onerror=reject;reader.readAsDataURL(file);});}
 function clearAttachment(){pendingAttachment=null;document.getElementById('attachPreview').classList.remove('visible');document.getElementById('attachName').textContent='';document.getElementById('attachSize').textContent='';document.getElementById('attachIcon').textContent='PDF';document.getElementById('userInput').placeholder='Reply to Trixie... or attach a document with 📎';document.getElementById('fileInput').value='';}
-async function fetchBrand(){const domain=document.getElementById('brandDomain').value.trim();if(!domain)return;const btn=document.getElementById('fetchBtn');btn.disabled=true;btn.textContent='Fetching...';let cleanDomain=domain.replace(/^https?:\/\//,'').replace(/\/.*$/,'');try{const faviconUrl=`https://www.google.com/s2/favicons?domain=${cleanDomain}&sz=64`;const proxyUrl=`https://api.allorigins.win/get?url=${encodeURIComponent('https://'+cleanDomain)}`;const res=await fetch(proxyUrl,{signal:AbortSignal.timeout(6000)});const data=await res.json();let orgName=cleanDomain,colour='#1D9E75';if(data.contents){const titleMatch=data.contents.match(/<title[^>]*>([^<]+)<\/title>/i);if(titleMatch)orgName=titleMatch[1].trim().split('|')[0].trim().split('-')[0].trim();const themeMatch=data.contents.match(/name=["']theme-color["'][^>]*content=["']([^"']+)["']/i)||data.contents.match(/content=["']([^"']+)["'][^>]*name=["']theme-color["']/i);if(themeMatch&&themeMatch[1].startsWith('#'))colour=themeMatch[1];}S.brandLogo=faviconUrl;S.brandColour=colour;S.brandDomain=cleanDomain;S.brandGuideName='';S.brandGuideText='';showBrandPreview(faviconUrl,orgName||cleanDomain,colour);if(!document.getElementById('orgName').value)document.getElementById('orgName').value=orgName;}catch(e){S.brandLogo=`https://www.google.com/s2/favicons?domain=${cleanDomain}&sz=64`;S.brandDomain=cleanDomain;S.brandGuideName='';S.brandGuideText='';document.getElementById('colourFallback').style.display='flex';showBrandPreview(S.brandLogo,cleanDomain,S.brandColour);}btn.disabled=false;btn.textContent='Fetch';}
+async function fetchBrand(){const domain=document.getElementById('brandDomain').value.trim();if(!domain)return;const btn=document.getElementById('fetchBtn');btn.disabled=true;btn.textContent='Fetching...';let cleanDomain=domain.replace(/^https?:\/\//,'').replace(/\/.*$/,'');try{const faviconUrl=`https://www.google.com/s2/favicons?domain=${cleanDomain}&sz=128`;const proxyUrl=`https://api.allorigins.win/get?url=${encodeURIComponent('https://'+cleanDomain)}`;const res=await fetch(proxyUrl,{signal:AbortSignal.timeout(6000)});const data=await res.json();let orgName=cleanDomain,colour='#1D9E75';if(data.contents){const titleMatch=data.contents.match(/<title[^>]*>([^<]+)<\/title>/i);if(titleMatch)orgName=titleMatch[1].trim().split('|')[0].trim().split('-')[0].trim();const themeMatch=data.contents.match(/name=["']theme-color["'][^>]*content=["']([^"']+)["']/i)||data.contents.match(/content=["']([^"']+)["'][^>]*name=["']theme-color["']/i);if(themeMatch&&themeMatch[1].startsWith('#'))colour=themeMatch[1];}S.brandLogo=faviconUrl;S.brandColour=colour;S.brandDomain=cleanDomain;S.brandGuideName='';S.brandGuideText='';showBrandPreview(faviconUrl,orgName||cleanDomain,colour);if(!document.getElementById('orgName').value)document.getElementById('orgName').value=orgName;}catch(e){S.brandLogo=`https://www.google.com/s2/favicons?domain=${cleanDomain}&sz=128`;S.brandDomain=cleanDomain;S.brandGuideName='';S.brandGuideText='';document.getElementById('colourFallback').style.display='flex';showBrandPreview(S.brandLogo,cleanDomain,S.brandColour);}btn.disabled=false;btn.textContent='Fetch';}
 function showBrandPreview(logoUrl,name,colour){document.getElementById('brandLogo').style.display='block';document.getElementById('brandLogo').src=logoUrl;document.getElementById('brandName').textContent=name;document.getElementById('brandUrl').textContent=S.brandDomain;document.getElementById('brandPreview').style.display='flex';}
 function clearBrand(){S.brandLogo='';S.brandDomain='';S.brandColour='#1D9E75';S.brandGuideName='';S.brandGuideText='';document.getElementById('brandPreview').style.display='none';document.getElementById('brandDomain').value='';document.getElementById('colourFallback').style.display='none';}
 document.getElementById('brandColour').addEventListener('change',function(){S.brandColour=this.value;const el=document.getElementById('brandUrl');if(el&&S.brandGuideName)el.innerHTML='<span class="colour-swatch" style="background:'+this.value+'"></span>Brand colour: '+this.value;});
@@ -439,31 +420,62 @@ function Meta(label,value){const{Paragraph,TextRun}=getDocx();return new Paragra
 function Spacer(){const{Paragraph,TextRun}=getDocx();return new Paragraph({children:[new TextRun('')],spacing:{before:100,after:0}});}
 function PB(){const{Paragraph,TextRun}=getDocx();return new Paragraph({pageBreakBefore:true,children:[new TextRun('')]});}
 function Footnote(){const{Paragraph,TextRun,BorderStyle}=getDocx();return new Paragraph({spacing:{before:480,after:0},border:{top:{style:BorderStyle.SINGLE,size:2,color:getAccentHex(),space:4}},children:[new TextRun({text:'Document control: Maintained per ISO 9001:2015 Clause 7.5. Printed copies are uncontrolled. Prepared with Trixie — gettrixie.com',size:18,font:'Arial',color:GRAY_HEX})]});}
-function Cover(artName,clauseRef){const{Paragraph,TextRun,AlignmentType,BorderStyle}=getDocx();const accent=getAccentHex();const date=new Date().toLocaleDateString('en-AU',{day:'2-digit',month:'long',year:'numeric'});return[
-  new Paragraph({spacing:{before:1440,after:0},children:[new TextRun('')]}),
-  new Paragraph({alignment:AlignmentType.LEFT,spacing:{before:0,after:80},children:[new TextRun({text:S.org,size:64,bold:true,font:'Arial',color:accent})]}),
-  new Paragraph({alignment:AlignmentType.LEFT,spacing:{before:0,after:60},children:[new TextRun({text:S.industry,size:24,font:'Arial',color:GRAY_HEX})]}),
-  new Paragraph({alignment:AlignmentType.LEFT,spacing:{before:0,after:600},border:{bottom:{style:BorderStyle.SINGLE,size:6,color:accent,space:8}},children:[new TextRun({text:date,size:20,font:'Arial',color:GRAY_HEX})]}),
-  new Paragraph({spacing:{before:600,after:0},children:[new TextRun('')]}),
-  new Paragraph({alignment:AlignmentType.LEFT,spacing:{before:0,after:80},children:[new TextRun({text:artName,size:48,bold:true,font:'Arial',color:DARK_HEX})]}),
-  new Paragraph({alignment:AlignmentType.LEFT,spacing:{before:0,after:80},children:[new TextRun({text:clauseRef,size:22,font:'Arial',color:GRAY_HEX})]}),
-  new Paragraph({alignment:AlignmentType.LEFT,spacing:{before:120,after:0},children:[new TextRun({text:'CONFIDENTIAL — ISO 9001:2015 QMS documentation. Printed copies are uncontrolled.',size:18,font:'Arial',color:GRAY_HEX})]}),
-];}
+async function fetchLogoBuffer(){
+  if(!S.brandLogo)return null;
+  try{
+    const res=await fetch(S.brandLogo);
+    if(!res.ok)return null;
+    const blob=await res.blob();
+    const buf=await blob.arrayBuffer();
+    const type=blob.type.includes('png')?'png':'jpeg';
+    return{data:buf,type};
+  }catch(e){return null;}
+}
+async function Cover(artName,clauseRef){
+  const{Paragraph,TextRun,AlignmentType,BorderStyle,ImageRun}=getDocx();
+  const accent=getAccentHex();
+  const date=new Date().toLocaleDateString('en-AU',{day:'2-digit',month:'long',year:'numeric'});
+  const elements=[];
+  elements.push(new Paragraph({spacing:{before:1440,after:0},children:[new TextRun('')]}));
+  if(S.brandLogo){
+    const logoData=await fetchLogoBuffer();
+    if(logoData){
+      elements.push(new Paragraph({alignment:AlignmentType.LEFT,spacing:{before:0,after:160},children:[new ImageRun({data:logoData.data,transformation:{width:80,height:80},type:logoData.type})]}));
+    }
+  }
+  elements.push(new Paragraph({alignment:AlignmentType.LEFT,spacing:{before:0,after:80},children:[new TextRun({text:S.org,size:64,bold:true,font:'Arial',color:accent})]}));
+  elements.push(new Paragraph({alignment:AlignmentType.LEFT,spacing:{before:0,after:60},children:[new TextRun({text:S.industry,size:24,font:'Arial',color:GRAY_HEX})]}));
+  elements.push(new Paragraph({alignment:AlignmentType.LEFT,spacing:{before:0,after:600},border:{bottom:{style:BorderStyle.SINGLE,size:6,color:accent,space:8}},children:[new TextRun({text:date,size:20,font:'Arial',color:GRAY_HEX})]}));
+  elements.push(new Paragraph({spacing:{before:600,after:0},children:[new TextRun('')]}));
+  elements.push(new Paragraph({alignment:AlignmentType.LEFT,spacing:{before:0,after:80},children:[new TextRun({text:artName,size:48,bold:true,font:'Arial',color:DARK_HEX})]}));
+  elements.push(new Paragraph({alignment:AlignmentType.LEFT,spacing:{before:0,after:80},children:[new TextRun({text:clauseRef,size:22,font:'Arial',color:GRAY_HEX})]}));
+  elements.push(new Paragraph({alignment:AlignmentType.LEFT,spacing:{before:120,after:0},children:[new TextRun({text:'CONFIDENTIAL — ISO 9001:2015 QMS documentation. Printed copies are uncontrolled.',size:18,font:'Arial',color:GRAY_HEX})]}));
+  return elements;
+}
 function makeDocHeader(){const{Header,Paragraph,TextRun,BorderStyle}=getDocx();const accent=getAccentHex();return new Header({children:[new Paragraph({spacing:{before:0,after:100},border:{bottom:{style:BorderStyle.SINGLE,size:4,color:accent,space:4}},children:[new TextRun({text:S.org+'  |  ISO 9001:2015  |  ',size:18,font:'Arial',bold:true,color:accent}),new TextRun({text:'Quality Management System',size:18,font:'Arial',color:GRAY_HEX})]})]});}
 function makeDocFooter(){const{Footer,Paragraph,TextRun,SimpleField,BorderStyle}=getDocx();const accent=getAccentHex();return new Footer({children:[new Paragraph({spacing:{before:100,after:0},border:{top:{style:BorderStyle.SINGLE,size:2,color:accent,space:4}},children:[new TextRun({text:'Confidential  |  Printed copies are uncontrolled  |  Prepared with Trixie — gettrixie.com  |  Page ',size:18,font:'Arial',color:GRAY_HEX}),new SimpleField('PAGE',{size:18,font:'Arial',color:GRAY_HEX})]})]});}
 function buildDoc(children){const{Document}=getDocx();return new Document({styles:{default:{document:{run:{font:'Arial',size:22,color:DARK_HEX}}},paragraphStyles:[{id:'Heading1',name:'Heading 1',basedOn:'Normal',next:'Normal',quickFormat:true,run:{size:30,bold:true,font:'Arial',color:DARK_HEX},paragraph:{spacing:{before:360,after:180},outlineLevel:0}},{id:'Heading2',name:'Heading 2',basedOn:'Normal',next:'Normal',quickFormat:true,run:{size:24,bold:true,font:'Arial',color:getAccentHex()},paragraph:{spacing:{before:260,after:120},outlineLevel:1}}]},sections:[{properties:{page:{size:{width:11906,height:16838},margin:{top:1440,right:1440,bottom:1440,left:1440}}},headers:{default:makeDocHeader()},footers:{default:makeDocFooter()},children}]});}
-function contentToDocx(artName,rawContent){const{Table,WidthType}=getDocx();const date=new Date().toLocaleDateString('en-AU',{day:'2-digit',month:'long',year:'numeric'});const reviewDate=new Date(Date.now()+365*24*60*60*1000).toLocaleDateString('en-AU',{day:'2-digit',month:'long',year:'numeric'});const children=[...Cover(artName,ART_CLAUSE[artName]||''),PB(),H1(artName),Meta('Document reference',`QMS-${artName.replace(/[^A-Za-z]/g,'').substring(0,4).toUpperCase()}-001`),Meta('Clause',ART_CLAUSE[artName]||''),Meta('Organisation',S.org),Meta('Industry',S.industry),Meta('Issue date',date),Meta('Review date',reviewDate),Meta('Approved by','Managing Director'),Spacer()];const lines=rawContent.split('\n');let i=0;while(i<lines.length){const line=lines[i];if(line.match(/^#{1}\s+/)){children.push(H1(line.replace(/^#+\s+/,'')));i++;}else if(line.match(/^#{2,}\s+/)){children.push(H2(line.replace(/^#+\s+/,'')));i++;}else if(line.includes('|')&&!line.match(/^[-|: ]+$/)){const tableLines=[];while(i<lines.length&&lines[i].includes('|')){if(!lines[i].match(/^[-|: ]+$/))tableLines.push(lines[i]);i++;}if(tableLines.length>=2){const rows=tableLines.map(l=>l.split('|').map(c=>c.trim()).filter((_,j,a)=>j>0&&j<a.length-1));if(rows[0]&&rows[0].length>0){const w=Math.floor(9026/rows[0].length);const widths=rows[0].map(()=>w);widths[widths.length-1]=9026-w*(rows[0].length-1);children.push(new Table({width:{size:9026,type:WidthType.DXA},columnWidths:widths,rows:[hdrRow(rows[0],widths),...rows.slice(1).map((r,idx)=>dataRow(r,widths,idx%2===0?LITE_HEX:WHITE_HEX))]}));children.push(Spacer());}}}else if(line.trim()&&!line.match(/^Before your audit/i)){children.push(Body(line.trim()));i++;}else{i++;}}children.push(Spacer(),Footnote());return buildDoc(children);}
+async function contentToDocx(artName,rawContent){
+  const{Table,WidthType}=getDocx();
+  const date=new Date().toLocaleDateString('en-AU',{day:'2-digit',month:'long',year:'numeric'});
+  const reviewDate=new Date(Date.now()+365*24*60*60*1000).toLocaleDateString('en-AU',{day:'2-digit',month:'long',year:'numeric'});
+  const coverElements=await Cover(artName,ART_CLAUSE[artName]||'');
+  const children=[...coverElements,PB(),H1(artName),Meta('Document reference',`QMS-${artName.replace(/[^A-Za-z]/g,'').substring(0,4).toUpperCase()}-001`),Meta('Clause',ART_CLAUSE[artName]||''),Meta('Organisation',S.org),Meta('Industry',S.industry),Meta('Issue date',date),Meta('Review date',reviewDate),Meta('Approved by','Managing Director'),Spacer()];
+  const lines=rawContent.split('\n');let i=0;
+  while(i<lines.length){const line=lines[i];if(line.match(/^#{1}\s+/)){children.push(H1(line.replace(/^#+\s+/,'')));i++;}else if(line.match(/^#{2,}\s+/)){children.push(H2(line.replace(/^#+\s+/,'')));i++;}else if(line.includes('|')&&!line.match(/^[-|: ]+$/)){const tableLines=[];while(i<lines.length&&lines[i].includes('|')){if(!lines[i].match(/^[-|: ]+$/))tableLines.push(lines[i]);i++;}if(tableLines.length>=2){const rows=tableLines.map(l=>l.split('|').map(c=>c.trim()).filter((_,j,a)=>j>0&&j<a.length-1));if(rows[0]&&rows[0].length>0){const w=Math.floor(9026/rows[0].length);const widths=rows[0].map(()=>w);widths[widths.length-1]=9026-w*(rows[0].length-1);children.push(new Table({width:{size:9026,type:WidthType.DXA},columnWidths:widths,rows:[hdrRow(rows[0],widths),...rows.slice(1).map((r,idx)=>dataRow(r,widths,idx%2===0?LITE_HEX:WHITE_HEX))]}));children.push(Spacer());}}}else if(line.trim()&&!line.match(/^Before your audit/i)){children.push(Body(line.trim()));i++;}else{i++;}}
+  children.push(Spacer(),Footnote());
+  return buildDoc(children);
+}
 async function downloadArt(name){
   if(!window.docxLoaded||!window.docx){alert('Documents still loading — please wait a moment and try again.');return;}
-  const content=S.artContent[name];
-  if(!content){alert('Document not yet generated.');return;}
-  try{const d=contentToDocx(name,content);const{Packer}=getDocx();const blob=await Packer.toBlob(d);const url=URL.createObjectURL(blob);const a=document.createElement('a');a.href=url;a.download=name.replace(/[^a-z0-9]/gi,'_').toLowerCase()+'.docx';a.click();URL.revokeObjectURL(url);}catch(e){alert('Error generating document: '+e.message);}
+  const content=S.artContent[name];if(!content){alert('Document not yet generated.');return;}
+  try{const d=await contentToDocx(name,content);const{Packer}=getDocx();const blob=await Packer.toBlob(d);const url=URL.createObjectURL(blob);const a=document.createElement('a');a.href=url;a.download=name.replace(/[^a-z0-9]/gi,'_').toLowerCase()+'.docx';a.click();URL.revokeObjectURL(url);}catch(e){alert('Error generating document: '+e.message);}
 }
 async function downloadAll(){
   if(!window.docxLoaded||!window.docx){alert('Documents still loading — please wait a moment and try again.');return;}
   const done=ALL_ARTS.filter(a=>S.artContent[a]);if(!done.length){alert('No documents generated yet.');return;}
   const{Packer}=getDocx();const zip=new JSZip();
-  for(const name of done){try{const d=contentToDocx(name,S.artContent[name]);const buf=await Packer.toBlob(d).then(b=>b.arrayBuffer());zip.file(name.replace(/[^a-z0-9]/gi,'_').toLowerCase()+'.docx',buf);}catch(e){console.error('Skip',name,e);}}
+  for(const name of done){try{const d=await contentToDocx(name,S.artContent[name]);const buf=await Packer.toBlob(d).then(b=>b.arrayBuffer());zip.file(name.replace(/[^a-z0-9]/gi,'_').toLowerCase()+'.docx',buf);}catch(e){console.error('Skip',name,e);}}
   const blob=await zip.generateAsync({type:'blob'});const url=URL.createObjectURL(blob);const a=document.createElement('a');a.href=url;a.download=S.org.replace(/[^a-z0-9]/gi,'_').toLowerCase()+'_iso9001_pack.zip';a.click();URL.revokeObjectURL(url);
 }
 function resetSession(){if(!confirm('This will clear all your progress and start fresh. Are you sure?'))return;localStorage.removeItem(STORAGE_KEY);location.reload();}
